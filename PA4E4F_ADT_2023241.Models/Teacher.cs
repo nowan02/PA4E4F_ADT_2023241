@@ -10,5 +10,6 @@ namespace PA4E4F_ADT_2023241.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public virtual ICollection<Subject> TaughtSubjects { get; set; }
+        public virtual ICollection<Grade> GivenGrades { get; set; }
     }
 }

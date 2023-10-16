@@ -9,8 +9,10 @@ namespace PA4E4F_ADT_2023241.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SubjectCode { get; set; }
         public string Name {  get; set; }
+        public int TeacherId { get; set; }
         public virtual ICollection<Student> EnrolledStudents {  get; set; }
         public virtual Teacher SubjectTeacher { get; set; }
 
+        public virtual ICollection<Grade> Grades { get; set; }
     }
 }
