@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PA4E4F_ADT_2023241.Models
 {
-    public class Subject
+    public class Subject : IModelWithID
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int SubjectCode { get; set; }
+        public int Id { get; set; }
         public string Name {  get; set; }
         public int TeacherId { get; set; }
         public virtual ICollection<Student> EnrolledStudents {  get; set; }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PA4E4F_ADT_2023241.Models
 {
-    public class Teacher
+    public class Teacher : IModelWithID
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using PA4E4F_ADT_2023241.Models;
 
 namespace PA4E4F_ADT_2023241.Repository
@@ -13,23 +14,60 @@ namespace PA4E4F_ADT_2023241.Repository
         IQueryable<T> ReadAll();
     }
 
-    public abstract class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : class, IModelWithID
     {
         protected DbContext _dbContext;
+        protected DbSet<T> _entities;
 
-        public Repository(DbContext dbContext) { _dbContext = dbContext; }
+        public Repository(DbContext dbContext) 
+        { 
+            _dbContext = dbContext;
+            _entities = _dbContext.Set<T>();
+        }
         public void Create(T entity)
         {
-            _dbContext.Set<T>().Add(entity);
+            _entities.Add(entity);
         }
 
         public IQueryable<T> ReadAll()
         {
-            return _dbContext.Set<T>();
+            return _entities.AsQueryable<T>();
         }
 
-        public abstract void Delete(int id);
-        public abstract T Read(int id);
-        public abstract void Update(int id, T entity);
+        public void Delete(int id)
+        {
+            _entities.Remove(Read(id));
+            _dbContext.SaveChanges();
+        }
+        public T Read(int id)
+        {
+            return _entities.First(x => x.Id == id);
+        }
+        public void Update(int id, T entity)
+        {
+            Delete(id);
+            _entities.Add(entity);
+            _dbContext.SaveChanges();
+        }
+    }
+
+    public class StudentRepository : Repository<Student>
+    {
+        public StudentRepository(DbContext dbContext) : base(dbContext) { }
+    }
+
+    public class TeacherRepository : Repository<Teacher>
+    {
+        public TeacherRepository(DbContext dbContext) : base(dbContext) { }
+    }
+
+    public class SubjectRepository : Repository<Subject>
+    {
+        public SubjectRepository(DbContext dbContext) : base(dbContext) { }
+    }
+
+    public class GradeRepository : Repository<Grade>
+    {
+        public GradeRepository(DbContext dbContext) : base(dbContext) { }
     }
 }
