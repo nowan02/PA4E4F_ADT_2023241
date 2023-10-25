@@ -12,4 +12,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.23" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PA4E4F_ADT_2023241.Models\PA4E4F_ADT_2023241.Models.csproj" />
+    <ProjectReference Include="..\PA4E4F_ADT_2023241.Repository\PA4E4F_ADT_2023241.Repository.csproj" />
+  </ItemGroup>
+
 </Project>
