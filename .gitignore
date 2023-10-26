@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/PA4E4F_ADT_2023241.Tests/PA4E4F_ADT_2023241.Tests.csproj
+/PA4E4F_ADT_2023241.Tests/Logic.Tests.cs
+/PA4E4F_ADT_2023241.Tests/PA4E4F_ADT_2023241.Tests.csproj
+/PA4E4F_ADT_2023241.Tests/Logic.Tests.cs
