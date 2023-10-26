@@ -45,8 +45,8 @@ namespace PA4E4F_ADT_2023241.Repository
 
             modelBuilder.Entity<Subject>(mb =>
             {
-                mb.HasKey(g => g.SubjectCode);
-                mb.Property(g => g.SubjectCode).ValueGeneratedOnAdd();
+                mb.HasKey(g => g.Id);
+                mb.Property(g => g.Id).ValueGeneratedOnAdd();
             });
 
             modelBuilder.Entity<Grade>(mb =>
