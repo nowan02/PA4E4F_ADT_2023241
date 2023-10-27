@@ -29,9 +29,9 @@ namespace PA4E4F_ADT_2023241.Repository
             _entities.Add(entity);
         }
 
-        public IQueryable<T> ReadAll()
+        public IEnumerable<T> ReadAll()
         {
-            return _entities.AsQueryable<T>();
+            return _entities.AsEnumerable();
         }
 
         public void Delete(int id)

@@ -1,5 +1,7 @@
-﻿using PA4E4F_ADT_2023241.Models;
+﻿using Castle.DynamicProxy.Generators.Emitters;
+using PA4E4F_ADT_2023241.Models;
 using PA4E4F_ADT_2023241.Repository;
+using System.Reflection.Metadata;
 
 namespace PA4E4F_ADT_2023241.Logic
 {
@@ -25,13 +27,20 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public T Read(Func<T, bool> QueryExpression)
         {
-            T? Readable = _ownRepository.ReadAll().FirstOrDefault(QueryExpression);
-            return _ownRepository.Read(Readable.Id);
+            try
+            {
+                T? Readable = _ownRepository.ReadAll().FirstOrDefault(QueryExpression);
+                return _ownRepository.Read(Readable.Id);
+            }
+            catch(InvalidOperationException ex)
+            {
+                throw ex;
+            }
         }
 
         public IEnumerable<T> ReadAll()
         {
-            return _ownRepository.ReadAll().AsEnumerable();
+            return _ownRepository.ReadAll();
         }    
 
         public void Update(T Entity, Func<T, bool> QueryExpression)
@@ -49,16 +58,23 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public void Delete(Func<T, bool> QueryExpression)
         {
-            _ownRepository.Delete(Read(QueryExpression).Id);
+            try
+            {
+                _ownRepository.Delete(Read(QueryExpression).Id);
+            }
+            catch(InvalidOperationException ex)
+            {
+                throw ex;
+            }
         }
     }
 
     public interface IStudentLogic : ILogic<Student>
     {
-        public IEnumerable<Grade> GetGradesOfStudent(GradeRepository Grades, Student Student);
-        public IEnumerable<Subject> GetSubjectsOfStudent(SubjectRepository Subjects, Student Student);
-        public void EnrollStudentInSubject(SubjectRepository Subjects, Student Student, int SubjectId);
-        public void DropStudentsSubject(SubjectRepository Subjects, Student Student, int SubjectId);
+        public IEnumerable<Grade> GetGradesOfStudent(Student Student);
+        public IEnumerable<Subject> GetSubjectsOfStudent(Student Student);
+        public void EnrollStudentInSubject(Student Student, int SubjectId);
+        public void DropStudentsSubject(Student Student, int SubjectId);
     }
 
     public interface ITeacherLogic : ILogic<Teacher>
