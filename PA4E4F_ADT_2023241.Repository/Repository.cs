@@ -11,7 +11,7 @@ namespace PA4E4F_ADT_2023241.Repository
         T Read(int id);
         void Update(int id, T entity);
         void Delete(int id);
-        IQueryable<T> ReadAll();
+        IEnumerable<T> ReadAll();
     }
 
     public class Repository<T> : IRepository<T> where T : class, IModelWithID
