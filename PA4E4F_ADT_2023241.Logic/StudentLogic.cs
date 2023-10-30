@@ -1,10 +1,5 @@
 ﻿using PA4E4F_ADT_2023241.Models;
 using PA4E4F_ADT_2023241.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PA4E4F_ADT_2023241.Logic
 {
@@ -22,21 +17,16 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public override void Create(Student Student)
         {
-            try
-            {
-                Read(s => s.Id == Student.Id);
 
-                throw new ArgumentException("Student Id was not unique!");
-            }
-            catch(InvalidOperationException)
+            if (Student.Name == null || Student.Name.Length == 0)
             {
-                if (Student.Name == null || Student.Name.Length == 0)
-                {
-                    throw new ArgumentException("Student name was empty and is required!");
-                }
+                throw new ArgumentException("Student name was empty and is required!");
             }
+
+            if (Read(st => st.Id == Student.Id) != null) throw new ArgumentException("Student Id was not unique!");
 
             _ownRepository.Create(Student);
+
         }
         public IEnumerable<Grade> GetGradesOfStudent(Student Student)
         {

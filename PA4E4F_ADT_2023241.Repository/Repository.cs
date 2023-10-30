@@ -27,6 +27,7 @@ namespace PA4E4F_ADT_2023241.Repository
         public void Create(T entity)
         {
             _entities.Add(entity);
+            _dbContext.SaveChanges();
         }
 
         public IEnumerable<T> ReadAll()
@@ -41,13 +42,12 @@ namespace PA4E4F_ADT_2023241.Repository
         }
         public T Read(int id)
         {
-            return _entities.First(x => x.Id == id);
+            return _entities.FirstOrDefault(x => x.Id == id);
         }
         public void Update(int id, T entity)
         {
             Delete(id);
             _entities.Add(entity);
-            _dbContext.SaveChanges();
         }
     }
 

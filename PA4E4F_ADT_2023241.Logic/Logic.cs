@@ -79,9 +79,9 @@ namespace PA4E4F_ADT_2023241.Logic
 
     public interface ITeacherLogic : ILogic<Teacher>
     {
-        public IEnumerable<Grade> GetGradesOfTeacher(GradeRepository Grades, Teacher Teacher);
-        public IEnumerable<Subject> GetTaughtSubjects(SubjectRepository Subjects, Teacher Teacher);
-        public void GradeStudentInSubject(GradeRepository Grades, Teacher Teacher, Student Student, int Grade);
+        public IEnumerable<Grade> GetGradesOfTeacher(Teacher Teacher);
+        public IEnumerable<Subject> GetTaughtSubjects(Teacher Teacher);
+        public void GradeStudentInSubject(Teacher Teacher, Student Student, Subject Subject, int Grade);
     }
 
     public interface ISubjectLogic : ILogic<Subject>
