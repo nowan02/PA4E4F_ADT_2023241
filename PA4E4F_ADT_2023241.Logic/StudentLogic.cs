@@ -49,5 +49,10 @@ namespace PA4E4F_ADT_2023241.Logic
             Subject su = _subjectRepository.Read(Subjectid);
             su.EnrolledStudents.Remove(Student);
         }
+
+        public double GetStudentAverage(Student Student)
+        {
+            return _gradeRepository.ReadAll().Where(g => g.StudentId == Student.Id).Average(g => g.FinalGrade);
+        }
     }
 }

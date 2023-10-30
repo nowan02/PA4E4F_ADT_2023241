@@ -75,6 +75,7 @@ namespace PA4E4F_ADT_2023241.Logic
         public IEnumerable<Subject> GetSubjectsOfStudent(Student Student);
         public void EnrollStudentInSubject(Student Student, int SubjectId);
         public void DropStudentsSubject(Student Student, int SubjectId);
+        public double GetStudentAverage(Student Student);
     }
 
     public interface ITeacherLogic : ILogic<Teacher>
@@ -86,9 +87,9 @@ namespace PA4E4F_ADT_2023241.Logic
 
     public interface ISubjectLogic : ILogic<Subject>
     {
-        public IEnumerable<Student> GetStudentsOnSubject(StudentRepository Students, Subject Subject);
-        public double GetGradeAverage(GradeRepository Grades, Subject Subject);
-        public Teacher GetSubjectTeacher(TeacherRepository Teachers, Subject Subject);
+        public IEnumerable<Student> GetStudentsOnSubject(Subject Subject);
+        public double GetGradeAverage(Subject Subject);
+        public Teacher GetSubjectTeacher(Subject Subject);
     }
 
 }
