@@ -17,6 +17,15 @@ namespace PA4E4F_ADT_2023241.Logic
             _gradeRepository = gradeRepository;
         }
 
+        public override void Create(Subject Subject)
+        {
+            if (_ownRepository.Read(Subject.Id) != null) throw new ArgumentException("Subject Id was not unique!");
+
+            if (Subject.Name == null || Subject.Name.Length == 0) throw new ArgumentException("Subject name is required!");
+
+            _ownRepository.Create(Subject);
+        }
+
         public IEnumerable<Student> GetStudentsOnSubject(Subject Subject)
         {
             return _studentRepository.ReadAll().Where(s => s.Id == Subject.Id);
