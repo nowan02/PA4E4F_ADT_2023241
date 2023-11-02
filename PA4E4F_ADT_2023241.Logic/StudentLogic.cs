@@ -5,11 +5,11 @@ namespace PA4E4F_ADT_2023241.Logic
 {
     public class StudentLogic : Logic<Student>, IStudentLogic
     {
-        private Repository<Student> _ownRepository;
-        private Repository<Grade> _gradeRepository;
-        private Repository<Subject> _subjectRepository;
+        private IStudentRepository _ownRepository;
+        private IGradeRepository _gradeRepository;
+        private ISubjectRepository _subjectRepository;
 
-        public StudentLogic(Repository<Student> OwnRepository, Repository<Grade> GradeRepository, Repository<Subject> SubjectRepository) : base(OwnRepository) 
+        public StudentLogic(IStudentRepository OwnRepository, IGradeRepository GradeRepository, ISubjectRepository SubjectRepository) : base(OwnRepository) 
         {
             _gradeRepository = GradeRepository;
             _subjectRepository = SubjectRepository;

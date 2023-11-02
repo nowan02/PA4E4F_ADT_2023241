@@ -5,12 +5,12 @@ namespace PA4E4F_ADT_2023241.Logic
 {
     public class SubjectLogic : Logic<Subject>, ISubjectLogic
     {
-        private Repository<Subject> _ownRepository;
-        private Repository<Teacher> _teacherRepository;
-        private Repository<Student> _studentRepository;
-        private Repository<Grade> _gradeRepository;
+        private ISubjectRepository _ownRepository;
+        private ITeacherRepository _teacherRepository;
+        private IStudentRepository _studentRepository;
+        private IGradeRepository _gradeRepository;
 
-        public SubjectLogic(Repository<Subject> ownRepository, Repository<Teacher> teacherRepositoy, Repository<Student> studentRepository, Repository<Grade> gradeRepository) : base(ownRepository)
+        public SubjectLogic(ISubjectRepository ownRepository, ITeacherRepository teacherRepositoy, IStudentRepository studentRepository, IGradeRepository gradeRepository) : base(ownRepository)
         {
             _teacherRepository = teacherRepositoy;
             _studentRepository = studentRepository;
@@ -28,7 +28,7 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public IEnumerable<Student> GetStudentsOnSubject(Subject Subject)
         {
-            return _studentRepository.ReadAll().Where(s => s.Id == Subject.Id);
+            return _studentRepository.ReadAll().Where(s => s.Id == Subject.Id).AsEnumerable();
         }
         public double GetGradeAverage(Subject Subject)
         {
@@ -38,6 +38,11 @@ namespace PA4E4F_ADT_2023241.Logic
         public Teacher GetSubjectTeacher(Subject Subject)
         {
             return _teacherRepository.Read(_ownRepository.Read(Subject.Id).TeacherId);
+        }
+
+        public IEnumerable<Subject> GetSubjectsWithNoTeacher()
+        {
+            return _ownRepository.ReadAll().Where(su => su.SubjectTeacher == null).AsEnumerable();
         }
     }
 }

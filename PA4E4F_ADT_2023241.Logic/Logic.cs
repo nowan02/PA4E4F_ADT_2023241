@@ -16,9 +16,9 @@ namespace PA4E4F_ADT_2023241.Logic
 
     public abstract class Logic<T> : ILogic<T> where T : class, IModelWithID
     {
-        private Repository<T> _ownRepository;
+        private IRepository<T> _ownRepository;
 
-        public Logic(Repository<T> OwnRepository)
+        public Logic(IRepository<T> OwnRepository)
         {
             this._ownRepository = OwnRepository;
         }
@@ -40,7 +40,7 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public IEnumerable<T> ReadAll()
         {
-            return _ownRepository.ReadAll();
+            return _ownRepository.ReadAll().AsEnumerable();
         }    
 
         public void Update(T Entity, Func<T, bool> QueryExpression)
@@ -90,6 +90,7 @@ namespace PA4E4F_ADT_2023241.Logic
         public IEnumerable<Student> GetStudentsOnSubject(Subject Subject);
         public double GetGradeAverage(Subject Subject);
         public Teacher GetSubjectTeacher(Subject Subject);
+        public IEnumerable<Subject> GetSubjectsWithNoTeacher();
     }
 
 }

@@ -5,12 +5,12 @@ namespace PA4E4F_ADT_2023241.Logic
 {
     public class TeacherLogic : Logic<Teacher>, ILogic<Teacher>
     {
-        private Repository<Teacher> _ownRepository;
-        private Repository<Subject> _subjectRepository;
-        private Repository<Grade> _gradeRepository;
-        private Repository<Student> _studentRepository;
+        private ITeacherRepository _ownRepository;
+        private ISubjectRepository _subjectRepository;
+        private IGradeRepository _gradeRepository;
+        private IStudentRepository _studentRepository;
 
-        public TeacherLogic(Repository<Teacher> ownRepository, Repository<Subject> subjectRepository, Repository<Grade> gradeRepository, Repository<Student> studentRepository) : base(ownRepository)
+        public TeacherLogic(ITeacherRepository ownRepository, ISubjectRepository subjectRepository, IGradeRepository gradeRepository, IStudentRepository studentRepository) : base(ownRepository)
         {
             _subjectRepository = subjectRepository;
             _gradeRepository = gradeRepository;
@@ -31,11 +31,11 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public IEnumerable<Grade> GetGradesOfTeacher(Teacher Teacher)
         {
-            return _gradeRepository.ReadAll().Where(g => g.TeacherId == Teacher.Id);
+            return _gradeRepository.ReadAll().Where(g => g.TeacherId == Teacher.Id).AsEnumerable();
         }
         public IEnumerable<Subject> GetTaughtSubjects(Teacher Teacher)
         {
-            return _subjectRepository.ReadAll().Where(su => su.TeacherId == Teacher.Id);
+            return _subjectRepository.ReadAll().Where(su => su.TeacherId == Teacher.Id).AsEnumerable();
         }
         public void GradeStudentInSubject(Teacher Teacher, Student Student, Subject Subject, int Grade)
         {
