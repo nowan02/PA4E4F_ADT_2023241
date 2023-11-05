@@ -5,7 +5,6 @@ namespace PA4E4F_ADT_2023241.Logic
 {
     public class StudentLogic : Logic<Student>, IStudentLogic
     {
-        private IStudentRepository _ownRepository;
         private IGradeRepository _gradeRepository;
         private ISubjectRepository _subjectRepository;
 
@@ -23,7 +22,7 @@ namespace PA4E4F_ADT_2023241.Logic
                 throw new ArgumentException("Student name was empty and is required!");
             }
 
-            if (Read(st => st.Id == Student.Id) != null) throw new ArgumentException("Student Id was not unique!");
+            if (_ownRepository.Read(Student.Id) != null) throw new ArgumentException("Student Id was not unique!");
 
             _ownRepository.Create(Student);
 

@@ -3,9 +3,8 @@ using PA4E4F_ADT_2023241.Repository;
 
 namespace PA4E4F_ADT_2023241.Logic
 {
-    public class TeacherLogic : Logic<Teacher>, ILogic<Teacher>
+    public class TeacherLogic : Logic<Teacher>, ITeacherLogic
     {
-        private ITeacherRepository _ownRepository;
         private ISubjectRepository _subjectRepository;
         private IGradeRepository _gradeRepository;
         private IStudentRepository _studentRepository;
@@ -24,7 +23,7 @@ namespace PA4E4F_ADT_2023241.Logic
                 throw new ArgumentException("Teacher name was empty!");
             }
 
-            if (Read(t => t.Id == Teacher.Id) != null) throw new ArgumentException("Teacher Id was not unique!");
+            if (_ownRepository.Read(Teacher.Id) != null) throw new ArgumentException("Teacher Id was not unique!");
 
             _ownRepository.Create(Teacher);
         }
@@ -43,7 +42,7 @@ namespace PA4E4F_ADT_2023241.Logic
 
             Grade _g1;
 
-            Grade? _g2 = _gradeRepository.ReadAll().FirstOrDefault(g => g.SubjectId == Subject.Id);
+            Grade? _g2 = _gradeRepository.ReadAll().First(g => g.SubjectId == Subject.Id);
 
             if (_g2 != null)
             {

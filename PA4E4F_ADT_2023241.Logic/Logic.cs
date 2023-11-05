@@ -16,11 +16,11 @@ namespace PA4E4F_ADT_2023241.Logic
 
     public abstract class Logic<T> : ILogic<T> where T : class, IModelWithID
     {
-        private IRepository<T> _ownRepository;
+        protected IRepository<T> _ownRepository;
 
         public Logic(IRepository<T> OwnRepository)
         {
-            this._ownRepository = OwnRepository;
+            _ownRepository = OwnRepository;
         }
 
         public abstract void Create(T Entity);
@@ -32,7 +32,7 @@ namespace PA4E4F_ADT_2023241.Logic
                 T? Readable = _ownRepository.ReadAll().FirstOrDefault(QueryExpression);
                 return _ownRepository.Read(Readable.Id);
             }
-            catch(InvalidOperationException ex)
+            catch(InvalidOperationException ex) 
             {
                 throw ex;
             }
@@ -62,7 +62,7 @@ namespace PA4E4F_ADT_2023241.Logic
             {
                 _ownRepository.Delete(Read(QueryExpression).Id);
             }
-            catch(InvalidOperationException ex)
+            catch(NullReferenceException ex)
             {
                 throw ex;
             }
@@ -92,5 +92,4 @@ namespace PA4E4F_ADT_2023241.Logic
         public Teacher GetSubjectTeacher(Subject Subject);
         public IEnumerable<Subject> GetSubjectsWithNoTeacher();
     }
-
 }

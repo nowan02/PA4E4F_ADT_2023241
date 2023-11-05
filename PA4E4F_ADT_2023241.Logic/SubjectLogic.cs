@@ -5,7 +5,6 @@ namespace PA4E4F_ADT_2023241.Logic
 {
     public class SubjectLogic : Logic<Subject>, ISubjectLogic
     {
-        private ISubjectRepository _ownRepository;
         private ITeacherRepository _teacherRepository;
         private IStudentRepository _studentRepository;
         private IGradeRepository _gradeRepository;
