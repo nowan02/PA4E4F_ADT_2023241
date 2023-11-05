@@ -30,15 +30,16 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public IEnumerable<Grade> GetGradesOfTeacher(Teacher Teacher)
         {
-            return _gradeRepository.ReadAll().Where(g => g.TeacherId == Teacher.Id).AsEnumerable();
+            return _gradeRepository.ReadAll().Where(g => g.TeacherId == Teacher.Id);
         }
         public IEnumerable<Subject> GetTaughtSubjects(Teacher Teacher)
         {
-            return _subjectRepository.ReadAll().Where(su => su.TeacherId == Teacher.Id).AsEnumerable();
+            return _subjectRepository.ReadAll().Where(su => su.TeacherId == Teacher.Id);
         }
         public void GradeStudentInSubject(Teacher Teacher, Student Student, Subject Subject, int Grade)
         {
             if (Grade < 0 || Grade > 5) throw new ArgumentException("Grade was not in range of 0 - 5!");
+            if (Subject.SubjectTeacher != Teacher) throw new ArgumentException("This teacher cannot grade, as they are not the subject teacher!");
 
             Grade _g1;
 

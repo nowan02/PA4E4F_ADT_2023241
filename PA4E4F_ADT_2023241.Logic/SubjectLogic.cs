@@ -27,7 +27,7 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public IEnumerable<Student> GetStudentsOnSubject(Subject Subject)
         {
-            return _studentRepository.ReadAll().Where(s => s.Id == Subject.Id).AsEnumerable();
+            return _studentRepository.ReadAll().Where(s => s.Id == Subject.Id);
         }
         public double GetGradeAverage(Subject Subject)
         {
@@ -41,7 +41,7 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public IEnumerable<Subject> GetSubjectsWithNoTeacher()
         {
-            return _ownRepository.ReadAll().Where(su => su.SubjectTeacher == null).AsEnumerable();
+            return _ownRepository.ReadAll().Where(su => su.SubjectTeacher == null);
         }
     }
 }
