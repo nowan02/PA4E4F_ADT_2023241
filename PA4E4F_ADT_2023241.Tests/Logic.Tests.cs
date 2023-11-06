@@ -11,6 +11,7 @@ namespace PA4E4F_ADT_2023241.Tests
     public class LogicTests
     {
         List<Subject> subjects;
+        List<Student> students;
 
         IStudentLogic MockedStudentLogic;
         ITeacherLogic MockedTeacherLogic;
@@ -37,12 +38,22 @@ namespace PA4E4F_ADT_2023241.Tests
             MockedTeacherRepository.Setup(repo => repo.Create(It.IsAny<Teacher>()));
 
             subjects = new List<Subject>();
+            students = new List<Student>();
             for(int i = 0; i < 10; i++)
             {
-                subjects.Add(new Subject() { Id = i, Name = "subject" + i });
+                subjects.Add(new Subject { Id = i, Name = "subject" + i, EnrolledStudents = new List<Student>()});
+                students.Add(new Student { Id = i, Name = "student" + i, Subjects = new List<Subject>()});
             }
 
             subjects[3].SubjectTeacher = new Teacher { Name = "teacher3", Id = 3 };
+
+            subjects[3].EnrolledStudents = new List<Student> { students[1], students[5], students[8], students[9] };
+
+            students[1].Subjects.Add(subjects[3]);
+            students[5].Subjects.Add(subjects[3]);
+            students[8].Subjects.Add(subjects[3]);
+            students[9].Subjects.Add(subjects[3]);
+
             subjects[5].SubjectTeacher = new Teacher { Name = "teacher5", Id = 5 };
             subjects[7].SubjectTeacher = new Teacher { Name = "teacher7", Id = 7 };
         }
@@ -65,20 +76,14 @@ namespace PA4E4F_ADT_2023241.Tests
         [Test]
         public void StudentWithDuplicateIdThrowsArgumentException()
         {
-            Student su = new Student
-            {
-                Name = "Test",
-                Id = 999
-            };
-
-            MockedStudentLogic.Create(su);
+            MockedStudentLogic.Create(students[4]);
             // Setup return
-            MockedStudentRepository.Setup(repo => repo.Read(su.Id)).Returns(su);
+            MockedStudentRepository.Setup(repo => repo.Read(students[4].Id)).Returns(students[4]);
 
             Student su2 = new Student
             {
                 Name = "OtherTest",
-                Id = 999
+                Id = students[4].Id
             };
 
             Assert.Throws<ArgumentException>(() => MockedStudentLogic.Create(su2));
@@ -138,6 +143,39 @@ namespace PA4E4F_ADT_2023241.Tests
             {
                 MockedTeacherLogic.GradeStudentInSubject(subjects[3].SubjectTeacher, It.IsAny<Student>(), subjects[5], 3);
             });
+        }
+
+        [Test]
+        public void EnrollStudentInSubjectUpdates()
+        {
+            subjects[3].EnrolledStudents = new List<Student>();
+
+            MockedStudentRepository.Setup(repo => repo.Update(students[7].Id, students[7]));
+            MockedSubjectRepository.Setup(repo => repo.Update(subjects[3].Id, subjects[3]));
+            MockedSubjectRepository.Setup(repo => repo.Read(subjects[3].Id)).Returns(subjects[3]);
+
+            MockedStudentLogic.EnrollStudentInSubject(students[7], subjects[3].Id);
+
+            if (students[7].Subjects.Contains(subjects[3]) && subjects[3].EnrolledStudents.Contains(students[7])) Assert.Pass();
+
+            Assert.Fail();
+        }
+
+        [Test]
+        public void GetStudentsInSubjectReturnsOnlyEnrolled()
+        {
+            MockedStudentRepository.Setup(repo => repo.ReadAll()).Returns(students.AsQueryable());
+
+            foreach(Student s in MockedSubjectLogic.GetStudentsOnSubject(subjects[3]))
+            {
+                if (s.Subjects.Contains(subjects[3]))
+                {
+                    continue;
+                }
+                else Assert.Fail();
+            }
+
+            Assert.Pass();
         }
     }
 }

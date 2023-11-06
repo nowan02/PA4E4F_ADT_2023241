@@ -27,14 +27,14 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public IEnumerable<Student> GetStudentsOnSubject(Subject Subject)
         {
-            return _studentRepository.ReadAll().Where(s => s.Id == Subject.Id);
+            return _studentRepository.ReadAll().Where(s => s.Subjects.Contains(Subject));
         }
         public double GetGradeAverage(Subject Subject)
         {
             return _gradeRepository.ReadAll().Where(g => g.SubjectId == Subject.Id).Average(g => g.FinalGrade);
         }
         
-        public Teacher GetSubjectTeacher(Subject Subject)
+        public Teacher? GetSubjectTeacher(Subject Subject)
         {
             return _teacherRepository.Read(_ownRepository.Read(Subject.Id).TeacherId);
         }

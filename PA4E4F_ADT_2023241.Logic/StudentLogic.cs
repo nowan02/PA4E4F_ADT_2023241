@@ -39,14 +39,20 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public void EnrollStudentInSubject(Student Student, int Subjectid) 
         {
-            Subject su = _subjectRepository.Read(Subjectid);
+            Subject? su = _subjectRepository.Read(Subjectid);
             su.EnrolledStudents.Add(Student);
+            _subjectRepository.Update(su.Id, su);
+            Student.Subjects.Add(su);
+            _ownRepository.Update(Student.Id, Student);
         }
 
         public void DropStudentsSubject(Student Student, int Subjectid)
         {
-            Subject su = _subjectRepository.Read(Subjectid);
+            Subject? su = _subjectRepository.Read(Subjectid);
             su.EnrolledStudents.Remove(Student);
+            _subjectRepository.Update(su.Id, su);
+            Student.Subjects.Remove(su);
+            _ownRepository.Update(Student.Id, Student);
         }
 
         public double GetStudentAverage(Student Student)
