@@ -22,8 +22,7 @@ app.MapGet("/", () => "It lives");
 // Student Endpoints
 app.MapGet("/Students", () => JsonConvert.SerializeObject(factory.CreateStudentLogic().ReadAll(), Formatting.Indented));
 app.MapGet("/Students/{id}", (int id) => JsonConvert.SerializeObject(factory.CreateStudentLogic().Read(s => s.Id == id), Formatting.Indented));
-app.MapGet("/Students/{id}/Grades", (int id) => JsonConvert.SerializeObject(factory.CreateStudentLogic().GetGradesOfStudent(), Formatting.Indented));
-app.MapGet("/Students/{id}/Grades/Average", (int id) => JsonConvert.SerializeObject(factory.CreateStudentLogic().get);
+app.MapGet("/Students/{id}/Grades", (int id) => JsonConvert.SerializeObject(factory.CreateStudentLogic().GetGradesOfStudent(id), Formatting.Indented));
 
 // Teacher Endpoints
 app.MapGet("/Teachers", () => JsonConvert.SerializeObject(factory.CreateTeacherLogic().ReadAll(), Formatting.Indented));
