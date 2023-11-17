@@ -28,22 +28,30 @@ namespace PA4E4F_ADT_2023241.Logic
             _ownRepository.Create(Teacher);
         }
 
-        public IEnumerable<Grade> GetGradesOfTeacher(Teacher Teacher)
+        public IEnumerable<Grade> GetGradesOfTeacher(int TeacherId)
         {
-            return _gradeRepository.ReadAll().Where(g => g.TeacherId == Teacher.Id);
+            return _gradeRepository.ReadAll().Where(g => g.TeacherId == TeacherId);
         }
-        public IEnumerable<Subject> GetTaughtSubjects(Teacher Teacher)
+        public IEnumerable<Subject> GetTaughtSubjects(int TeacherId)
         {
-            return _subjectRepository.ReadAll().Where(su => su.TeacherId == Teacher.Id);
+            return _subjectRepository.ReadAll().Where(su => su.TeacherId == TeacherId);
         }
-        public void GradeStudentInSubject(Teacher Teacher, Student Student, Subject Subject, int Grade)
+        public void GradeStudentInSubject(int TeacherId, int StudentId, int SubjectId, int Grade)
         {
+            Teacher? t = _ownRepository.Read(TeacherId);
+            Student? s = _studentRepository.Read(StudentId);
+            Subject? su = _subjectRepository.Read(SubjectId);
+
+            if (t == null) throw new NullReferenceException("Teacher with specified ID does not exist");
+            if (s == null) throw new NullReferenceException("Student with specified ID does not exist");
+            if (su == null) throw new NullReferenceException("Subject with specified ID does not exist");
+
             if (Grade < 0 || Grade > 5) throw new ArgumentException("Grade was not in range of 0 - 5!");
-            if (Subject.SubjectTeacher != Teacher) throw new ArgumentException("This teacher cannot grade, as they are not the subject teacher!");
+            if (su.TeacherId != TeacherId) throw new ArgumentException("This teacher cannot grade, as they are not the subject teacher!");
 
             Grade _g1;
 
-            Grade? _g2 = _gradeRepository.ReadAll().First(g => g.SubjectId == Subject.Id);
+            Grade? _g2 = _gradeRepository.ReadAll().First(g => g.SubjectId == SubjectId);
 
             if (_g2 != null)
             {
@@ -53,17 +61,17 @@ namespace PA4E4F_ADT_2023241.Logic
             {
                 _g1 = new Grade {
                     FinalGrade = Grade,
-                    StudentId = Student.Id,
-                    TeacherId = Teacher.Id,
-                    SubjectId = Subject.Id
+                    StudentId = StudentId,
+                    TeacherId = TeacherId,
+                    SubjectId = SubjectId
                 };
 
                 _gradeRepository.Create(_g1);
             }
 
-            Student.Grades.Add(_g1);
+            s.Grades.Add(_g1);
 
-            _studentRepository.Update(Student.Id, Student);
+            _studentRepository.Update(StudentId, s);
         }
     }
 }

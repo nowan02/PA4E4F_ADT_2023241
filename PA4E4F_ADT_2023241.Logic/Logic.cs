@@ -71,25 +71,25 @@ namespace PA4E4F_ADT_2023241.Logic
 
     public interface IStudentLogic : ILogic<Student>
     {
-        public IEnumerable<Grade> GetGradesOfStudent(Student Student);
-        public IEnumerable<Subject> GetSubjectsOfStudent(Student Student);
-        public void EnrollStudentInSubject(Student Student, int SubjectId);
-        public void DropStudentsSubject(Student Student, int SubjectId);
-        public double GetStudentAverage(Student Student);
+        public IEnumerable<Grade> GetGradesOfStudent(int StudentId);
+        public IEnumerable<Subject> GetSubjectsOfStudent(int StudentId);
+        public void EnrollStudentInSubject(int StudentId, int SubjectId);
+        public void DropStudentsSubject(int StudentId, int SubjectId);
+        public double GetStudentAverage(int StudentId);
     }
 
     public interface ITeacherLogic : ILogic<Teacher>
     {
-        public IEnumerable<Grade> GetGradesOfTeacher(Teacher Teacher);
-        public IEnumerable<Subject> GetTaughtSubjects(Teacher Teacher);
-        public void GradeStudentInSubject(Teacher Teacher, Student Student, Subject Subject, int Grade);
+        public IEnumerable<Grade> GetGradesOfTeacher(int TeacherId);
+        public IEnumerable<Subject> GetTaughtSubjects(int TeacherId);
+        public void GradeStudentInSubject(int TeacherId, int StudentId, int SubjectId, int Grade);
     }
 
     public interface ISubjectLogic : ILogic<Subject>
     {
-        public IEnumerable<Student> GetStudentsOnSubject(Subject Subject);
-        public double GetGradeAverage(Subject Subject);
-        public Teacher GetSubjectTeacher(Subject Subject);
+        public IEnumerable<Student> GetStudentsOnSubject(int SubjectId);
+        public double GetGradeAverage(int SubjectId);
+        public Teacher GetSubjectTeacher(int SubjectId);
         public IEnumerable<Subject> GetSubjectsWithNoTeacher();
     }
 }

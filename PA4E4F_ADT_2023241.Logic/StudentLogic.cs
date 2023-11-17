@@ -27,37 +27,43 @@ namespace PA4E4F_ADT_2023241.Logic
             _ownRepository.Create(Student);
 
         }
-        public IEnumerable<Grade> GetGradesOfStudent(Student Student)
+        public IEnumerable<Grade> GetGradesOfStudent(int StudentId)
         {
-            return _gradeRepository.ReadAll().Where(g => g.StudentId == Student.Id).AsEnumerable();
+            return _gradeRepository.ReadAll().Where(g => g.StudentId == StudentId).AsEnumerable();
         }
 
-        public IEnumerable<Subject> GetSubjectsOfStudent(Student Student)
+        public IEnumerable<Subject> GetSubjectsOfStudent(int id)
         {
-            return _subjectRepository.ReadAll().Where(su => su.EnrolledStudents.Contains(Student)).AsEnumerable();
+            return _subjectRepository.ReadAll().Where(su => su.EnrolledStudents.Contains(Read(s => s.Id == id))).AsEnumerable();
         }
 
-        public void EnrollStudentInSubject(Student Student, int Subjectid) 
+        public void EnrollStudentInSubject(int StudentId, int SubjectId) 
         {
+            Student? s = _ownRepository.Read(StudentId);
+            Subject? su = _subjectRepository.Read(SubjectId);
+
+            if (s == null) throw new NullReferenceException("Student with specified ID doesn't exist");
+            if (su == null) throw new NullReferenceException("Subject with specified ID doesn't exist");
+
+            su.EnrolledStudents.Add(s);
+            _subjectRepository.Update(SubjectId, su);
+            s.Subjects.Add(su);
+            _ownRepository.Update(StudentId, s);
+        }
+
+        public void DropStudentsSubject(int StudentId, int Subjectid)
+        {
+            Student? s = _ownRepository.Read(StudentId);
             Subject? su = _subjectRepository.Read(Subjectid);
-            su.EnrolledStudents.Add(Student);
+            su.EnrolledStudents.Remove(s);
             _subjectRepository.Update(su.Id, su);
-            Student.Subjects.Add(su);
-            _ownRepository.Update(Student.Id, Student);
+            s.Subjects.Remove(su);
+            _ownRepository.Update(StudentId, s);
         }
 
-        public void DropStudentsSubject(Student Student, int Subjectid)
+        public double GetStudentAverage(int StudentId)
         {
-            Subject? su = _subjectRepository.Read(Subjectid);
-            su.EnrolledStudents.Remove(Student);
-            _subjectRepository.Update(su.Id, su);
-            Student.Subjects.Remove(su);
-            _ownRepository.Update(Student.Id, Student);
-        }
-
-        public double GetStudentAverage(Student Student)
-        {
-            return _gradeRepository.ReadAll().Where(g => g.StudentId == Student.Id).Average(g => g.FinalGrade);
+            return _gradeRepository.ReadAll().Where(g => g.StudentId == StudentId).Average(g => g.FinalGrade);
         }
     }
 }

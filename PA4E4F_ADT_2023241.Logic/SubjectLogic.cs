@@ -25,18 +25,19 @@ namespace PA4E4F_ADT_2023241.Logic
             _ownRepository.Create(Subject);
         }
 
-        public IEnumerable<Student> GetStudentsOnSubject(Subject Subject)
+        public IEnumerable<Student> GetStudentsOnSubject(int SubjectId)
         {
-            return _studentRepository.ReadAll().Where(s => s.Subjects.Contains(Subject));
+            Subject? su = _ownRepository.Read(SubjectId);
+            return _studentRepository.ReadAll().Where(s => s.Subjects.Contains(su));
         }
-        public double GetGradeAverage(Subject Subject)
+        public double GetGradeAverage(int SubjectId)
         {
-            return _gradeRepository.ReadAll().Where(g => g.SubjectId == Subject.Id).Average(g => g.FinalGrade);
+            return _gradeRepository.ReadAll().Where(g => g.SubjectId == SubjectId).Average(g => g.FinalGrade);
         }
         
-        public Teacher? GetSubjectTeacher(Subject Subject)
+        public Teacher? GetSubjectTeacher(int SubjectId)
         {
-            return _teacherRepository.Read(_ownRepository.Read(Subject.Id).TeacherId);
+            return _teacherRepository.Read(_ownRepository.Read(SubjectId).TeacherId);
         }
 
         public IEnumerable<Subject> GetSubjectsWithNoTeacher()
