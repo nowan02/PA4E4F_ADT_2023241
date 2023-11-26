@@ -11,6 +11,11 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.23" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.23" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.23" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PA4E4F_ADT_2023241.Models\PA4E4F_ADT_2023241.Models.csproj" />
   </ItemGroup>
 
 </Project>

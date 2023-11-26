@@ -25,7 +25,7 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public abstract void Create(T Entity);
 
-        public T Read(Func<T, bool> QueryExpression)
+        public T? Read(Func<T, bool> QueryExpression)
         {
             try
             {
