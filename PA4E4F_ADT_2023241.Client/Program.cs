@@ -6,5 +6,4 @@ const string SERVER_URI = "http://127.0.0.1:8080";
 Console.WriteLine(SERVER_URI.GetType().Name);
 GradingApp App = new GradingApp(SERVER_URI, new HttpClient());
 App.EnsureConnection();
-App.CreateStudent();
-Console.ReadKey();
+App.Run();
