@@ -5,7 +5,7 @@ using System.Reflection.Metadata;
 
 namespace PA4E4F_ADT_2023241.Logic
 {
-    public interface ILogic<T> where T : class, IModelWithID
+    public interface ILogic<T> where T : class, IDbModel
     {
         public void Create(T Entity);
         public T Read(Func<T, bool> QueryExpression);
@@ -14,7 +14,7 @@ namespace PA4E4F_ADT_2023241.Logic
         public void Update(T Entity, Func<T, bool> QueryExpression);
     }
 
-    public abstract class Logic<T> : ILogic<T> where T : class, IModelWithID
+    public abstract class Logic<T> : ILogic<T> where T : class, IDbModel
     {
         protected IRepository<T> _ownRepository;
 
@@ -45,12 +45,14 @@ namespace PA4E4F_ADT_2023241.Logic
 
         public void Update(T Entity, Func<T, bool> QueryExpression)
         {
+            if (Read(x => x.Id == Entity.Id) != null) throw new InvalidOperationException("Updated Id was not unique!");
+
             try
             {
                 T? ToMod = Read(QueryExpression);
                 _ownRepository.Update(ToMod.Id, Entity);
             }
-            catch(InvalidOperationException ex)
+            catch(NullReferenceException ex)
             {
                 throw ex;
             }

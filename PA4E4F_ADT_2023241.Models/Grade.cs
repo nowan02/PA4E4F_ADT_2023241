@@ -4,11 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace PA4E4F_ADT_2023241.Models
 {
-    public class Grade : IModelWithID
+    public class Grade : IDbModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+        public string Name { get; set; }
         public int SubjectId { get; set; }
         public int StudentId {  get; set; }
         public int TeacherId { get; set; }

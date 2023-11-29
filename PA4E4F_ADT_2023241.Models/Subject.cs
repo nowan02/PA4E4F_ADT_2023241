@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace PA4E4F_ADT_2023241.Models
 {
-    public class Subject : IModelWithID
+    public class Subject : IDbModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

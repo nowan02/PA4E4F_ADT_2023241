@@ -12,7 +12,7 @@ namespace PA4E4F_ADT_2023241.Repository
         IQueryable<T> ReadAll();
     }
 
-    public class Repository<T> : IRepository<T> where T : class, IModelWithID
+    public class Repository<T> : IRepository<T> where T : class, IDbModel
     {
         protected DbContext _dbContext;
         protected DbSet<T> _entities;
@@ -42,10 +42,12 @@ namespace PA4E4F_ADT_2023241.Repository
         {
             return _entities.FirstOrDefault(x => x.Id == id);
         }
-        public void Update(int id, T entity)
+        // IDs cannot be modified, only names of Models
+        public virtual void Update(int id, T entity)
         {
-            Delete(id);
-            _entities.Add(entity);
+            T _toMod = Read(id);
+            _toMod.Name = entity.Name;
+            _dbContext.SaveChanges();
         }
     }
 
@@ -83,5 +85,14 @@ namespace PA4E4F_ADT_2023241.Repository
     public class GradeRepository : Repository<Grade>, IGradeRepository
     {
         public GradeRepository(DbContext dbContext) : base(dbContext) { }
+
+        public override void Update(int id, Grade entity)
+        {
+            Grade grade = Read(id);
+
+            grade.FinalGrade = entity.FinalGrade;
+
+            base.Update(id, entity);
+        }
     }
 }

@@ -79,21 +79,21 @@ namespace PA4E4F_ADT_2023241.Client
         /// </summary>
         /// <param name="Model"></param>
         /// <returns></returns>
-        private string _serialize(IModelWithID Model)
+        private string _serialize(IDbModel Model)
         {
+            Model.Id = new Random().Next(1000, 9999);
             string JString = JsonConvert.SerializeObject(Model, Formatting.Indented);
             string URI = Uri;
-            int id = new Random().Next(1000, 9999);
 
             switch(Model.GetType().Name)
             {
-                case "Student": URI += $"/Students/{id}/Create";
+                case "Student": URI += $"/Students/{Model.Id}/Create";
                     break;
-                case "Teacher": URI += $"/Teachers/{id}/Create";
+                case "Teacher": URI += $"/Teachers/{Model.Id}/Create";
                     break;
-                case "Subject": URI += $"/Subjects/{id}/Create";
+                case "Subject": URI += $"/Subjects/{Model.Id}/Create";
                     break;
-                case "Grade": URI += $"/Grades/{id}/Create";
+                case "Grade": URI += $"/Grades/{Model.Id}/Create";
                     break;
                 default:
                     Console.WriteLine("Object type cannot be serialized.");
@@ -111,7 +111,7 @@ namespace PA4E4F_ADT_2023241.Client
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private IModelWithID? _deserialize(string path)
+        private IDbModel? _deserialize(string path)
         {
             string URI = Uri + path;
 
@@ -130,7 +130,7 @@ namespace PA4E4F_ADT_2023241.Client
             return null;
         }
 
-        private List<IModelWithID>? _deserializeSeveral(string path)
+        private List<IDbModel>? _deserializeSeveral(string path)
         {
             string URI = Uri + path;
 
@@ -138,12 +138,12 @@ namespace PA4E4F_ADT_2023241.Client
             HttpResponseMessage Response = _httpClient.Send(Request);
             string content = Response.Content.ReadAsStringAsync().Result;
 
-            List<IModelWithID> Models = new() { };
+            List<IDbModel> Models = new() { };
 
-            if (path.Contains("Student")) Models.AddRange(JsonConvert.DeserializeObject<List<Student>>(content));
-            if (path.Contains("Teacher")) Models.AddRange(JsonConvert.DeserializeObject<List<Teacher>>(content));
-            if (path.Contains("Subject")) Models.AddRange(JsonConvert.DeserializeObject<List<Subject>>(content));
-            if (path.Contains("Grade")) Models.AddRange(JsonConvert.DeserializeObject<List<Grade>>(content));
+            if (path.EndsWith("Students")) Models.AddRange(JsonConvert.DeserializeObject<List<Student>>(content));
+            if (path.EndsWith("Teachers")) Models.AddRange(JsonConvert.DeserializeObject<List<Teacher>>(content));
+            if (path.EndsWith("Subjects")) Models.AddRange(JsonConvert.DeserializeObject<List<Subject>>(content));
+            if (path.EndsWith("Grades")) Models.AddRange(JsonConvert.DeserializeObject<List<Grade>>(content));
 
             return Models;
         }
@@ -163,7 +163,7 @@ namespace PA4E4F_ADT_2023241.Client
 
                     student.Name = Console.ReadLine();
 
-                    Console.WriteLine("Student named {0} will be registered.");
+                    Console.WriteLine("Student named {0} will be registered.", student.Name);
 
                     Console.WriteLine("Response from server: {0}", _serialize(student));
                     break;
@@ -175,7 +175,7 @@ namespace PA4E4F_ADT_2023241.Client
 
                     teacher.Name = Console.ReadLine();
 
-                    Console.WriteLine("Teacher named {0} will be registered.");
+                    Console.WriteLine("Teacher named {0} will be registered.", teacher.Name);
 
                     Console.WriteLine("Response from server: {0}", _serialize(teacher));
                     break;
@@ -183,11 +183,11 @@ namespace PA4E4F_ADT_2023241.Client
                     Subject subject = new Subject();
 
                     Console.Clear();
-                    Console.WriteLine("Teacher Name:");
+                    Console.WriteLine("Subject Name:");
 
                     subject.Name = Console.ReadLine();
 
-                    Console.WriteLine("Teacher named {0} will be registered.");
+                    Console.WriteLine("Subject named {0} will be registered.", subject.Name);
 
                     Console.WriteLine("Response from server: {0}", _serialize(subject));
                     break;
@@ -236,11 +236,17 @@ namespace PA4E4F_ADT_2023241.Client
             try
             {
                 int id = Int32.Parse(Console.ReadLine());
-
+                Console.Clear();
                 switch (input)
                 {
                     case "student":
-                        
+                        Student s = (Student)_deserialize($"/Students/{id}");
+                        Console.WriteLine("Student: {0} {1}", s.Id, s.Name);
+                        Console.WriteLine("Enrolled subjects:");
+                        foreach(Subject su in _deserializeSeveral($"/Students/{id}/Subjects"))
+                        {
+                            Console.WriteLine("\t{0} {1}", su.Id, su.Name);
+                        }
                         break;
                     case "teacher":
                         

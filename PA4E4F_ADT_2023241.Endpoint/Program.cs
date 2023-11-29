@@ -1,15 +1,12 @@
-using PA4E4F_ADT_2023241.Logic;
 using PA4E4F_ADT_2023241.Models;
 using PA4E4F_ADT_2023241.Repository;
 using Newtonsoft.Json;
 using PA4E4F_ADT_2023241.Endpoint;
-using System.Text.Json.Serialization;
-using System.IO.Pipelines;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.AllowSynchronousIO = true;
+builder.Services.Configure<KestrelServerOptions>(options => {
+    options.AllowSynchronousIO = false;
 });
 var app = builder.Build();
 
@@ -24,145 +21,41 @@ LogicFactory factory = new LogicFactory(
 
 app.MapGet("/", () => "Working as intended!");
 
-// Student Endpoints
-app.MapGet("/Students", () => JsonConvert.SerializeObject(factory.CreateStudentLogic().ReadAll(), Formatting.Indented));
-app.MapGet("/Students/{id}", (int id) => JsonConvert.SerializeObject(factory.CreateStudentLogic().Read(s => s.Id == id), Formatting.Indented));
-app.MapGet("/Students/{id}/Grades", (int id) => JsonConvert.SerializeObject(factory.CreateStudentLogic().GetGradesOfStudent(id), Formatting.Indented));
+// Student GET
+app.MapGet("/Students", async () => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateStudentLogic().ReadAll(), Formatting.Indented)));
+app.MapGet("/Students/{id}", async (int id) => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateStudentLogic().Read(s => s.Id == id), Formatting.Indented)));
+app.MapGet("/Students/{id}/Grades", async (int id) => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateStudentLogic().GetGradesOfStudent(id), Formatting.Indented)));
+app.MapGet("/Students/{id}/Subjects", async (int id) => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateStudentLogic().GetSubjectsOfStudent(id), Formatting.Indented)));
+app.MapGet("/Students/{id}/Average", async (int id) => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateStudentLogic().GetStudentAverage(id), Formatting.Indented)));
 
-app.MapPost("/Students/{id}/Create", (HttpContext context, int id) => { 
-    try
-    {
-        string input;
-        
-        using(StreamReader sr = new (context.Request.Body))
-        {
-            input = sr.ReadToEnd();
-        }
+// Student POST
+app.MapPost("/Students/{id}/Create", async (HttpContext context, int id) => await Task<String>.Run(() => ObjectCreator.CreateObject<Student>(context, id, factory)));
 
-        Student? s = JsonConvert.DeserializeObject<Student>(input);
-        s.Id = id;
+// Student PUT
+app.MapPut("/Students/{id}/Update", async (HttpContext context, int id) => await Task<String>.Run(() => ObjectUpdater.UpdateObject<Student>(context, id, factory)));
 
-        factory.CreateStudentLogic().Create(s);
+// Teacher GET
+app.MapGet("/Teachers", async () => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateTeacherLogic().ReadAll(), Formatting.Indented)));
+app.MapGet("/Teachers/{id}", async (int id) => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateTeacherLogic().Read(t => t.Id == id), Formatting.Indented)));
+app.MapGet("/Teachers/{id}/Grades", async (int id) => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateTeacherLogic().GetGradesOfTeacher(id), Formatting.Indented)));
+app.MapGet("/Teachers/{id}/Subjects", async (int id) => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateTeacherLogic().GetTaughtSubjects(id), Formatting.Indented)));
 
-        using (StreamWriter sw = new StreamWriter(context.Response.Body))
-        {
-            sw.WriteLine("Student successfully created with id {0}", id);
-        }
-    }
-    catch(InvalidCastException)
-    {
-        context.Response.StatusCode = 500;
-        
-        using(StreamWriter sw = new StreamWriter(context.Response.Body))
-        {
-            sw.WriteLine("Object sent cannot be converted to type 'Student'.");
-        }
-    }
-    catch(ArgumentException ex)
-    {
-        context.Response.StatusCode = 500;
+// Teacher POST
+app.MapPost("/Teachers/{id}/Create", async (HttpContext context, int id) => await Task<String>.Run(() => ObjectCreator.CreateObject<Teacher>(context, id, factory)));
+app.MapPost("/Teachers/{id}/Grade/{StudentId}", async (HttpContext context, int id, int StudentId, int SubjectId) => await Task<String>.Run(() => Grader.Grade(context, id, StudentId, SubjectId, factory)));
 
-        using (StreamWriter sw = new StreamWriter(context.Response.Body))
-        {
-            sw.WriteLine(ex.Message);
-        }
-    }
+// Teacher PUT
+app.MapPut("/Teachers/{id}/Update", (HttpContext context, int id) => ObjectUpdater.UpdateObject<Teacher>(context, id, factory));
 
-    return Task.CompletedTask;
-});
+// Subject GET
+app.MapGet("/Subjects", async () => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateSubjectLogic().ReadAll(), Formatting.Indented)));
+app.MapGet("/Subjects/{id}", async (int id) => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateSubjectLogic().Read(su => su.Id == id), Formatting.Indented)));
+app.MapGet("/Subjects/{id}/Students", async (int id) => await Task<String>.Run(() => JsonConvert.SerializeObject(factory.CreateSubjectLogic().GetStudentsOnSubject(id), Formatting.Indented)));
 
-// Teacher Endpoints
-app.MapGet("/Teachers", () => JsonConvert.SerializeObject(factory.CreateTeacherLogic().ReadAll(), Formatting.Indented));
-app.MapGet("/Teachers/{id}", (int id) => JsonConvert.SerializeObject(factory.CreateTeacherLogic().Read(t => t.Id == id), Formatting.Indented));
-app.MapGet("/Teachers/{id}/Grades", (int id) => JsonConvert.SerializeObject(factory.CreateTeacherLogic().Read(t => t.Id == id).GivenGrades, Formatting.Indented));
+// Subject POST
+app.MapPost("/Subjects/{id}/Create", async (HttpContext context, int id) => await Task<String>.Run(() => ObjectCreator.CreateObject<Subject>(context, id, factory)));
 
-app.MapPost("/Teachers/{id}/Create", (HttpContext context, int id) => {
-    try
-    {
-        string input;
-
-        using (StreamReader sr = new(context.Request.Body))
-        {
-            input = sr.ReadToEnd();
-        }
-
-        Teacher? t = JsonConvert.DeserializeObject<Teacher>(input);
-        t.Id = id;
-
-        factory.CreateTeacherLogic().Create(t);
-
-        using (StreamWriter sw = new StreamWriter(context.Response.Body))
-        {
-            sw.WriteLine("Teacher successfully created with id {0}", id);
-        }
-    }
-    catch (InvalidCastException)
-    {
-        context.Response.StatusCode = 500;
-
-        using (StreamWriter sw = new StreamWriter(context.Response.Body))
-        {
-            sw.WriteLine("Object sent cannot be converted to type 'Teacher'.");
-        }
-    }
-    catch (ArgumentException ex)
-    {
-        context.Response.StatusCode = 500;
-
-        using (StreamWriter sw = new StreamWriter(context.Response.Body))
-        {
-            sw.WriteLine(ex.Message);
-        }
-    }
-
-    return Task.CompletedTask;
-});
-
-// Subject Endpoints
-app.MapGet("/Subjects", () => JsonConvert.SerializeObject(factory.CreateSubjectLogic().ReadAll(), Formatting.Indented));
-app.MapGet("/Subjects/{id}", (int id) => JsonConvert.SerializeObject(factory.CreateSubjectLogic().Read(su => su.Id == id), Formatting.Indented));
-app.MapGet("/Subjects/{id}/Grades", (int id) => JsonConvert.SerializeObject(factory.CreateSubjectLogic().Read(su => su.Id == id).Grades, Formatting.Indented));
-
-app.MapPost("/Subjects/{id}/Create", (HttpContext context, int id) => {
-    try
-    {
-        string input;
-
-        using (StreamReader sr = new(context.Request.Body))
-        {
-            input = sr.ReadToEnd();
-        }
-
-        Subject? su = JsonConvert.DeserializeObject<Subject>(input);
-        su.Id = id;
-
-        factory.CreateSubjectLogic().Create(su);
-
-        using (StreamWriter sw = new StreamWriter(context.Response.Body))
-        {
-            sw.WriteLine("Subject successfully created with id {0}", id);
-        }
-    }
-    catch (InvalidCastException)
-    {
-        context.Response.StatusCode = 500;
-
-        using (StreamWriter sw = new StreamWriter(context.Response.Body))
-        {
-            sw.WriteLine("Object sent cannot be converted to type 'Subject'.");
-        }
-    }
-    catch (ArgumentException ex)
-    {
-        context.Response.StatusCode = 500;
-
-        using (StreamWriter sw = new StreamWriter(context.Response.Body))
-        {
-            sw.WriteLine(ex.Message);
-        }
-    }
-
-    return Task.CompletedTask;
-});
+// Subject PUT
+app.MapPut("/Subjects/{id}/Update", async (HttpContext context, int id) => await Task<String>.Run(() => ObjectUpdater.UpdateObject<Subject>(context, id, factory)));
 
 app.Run();
