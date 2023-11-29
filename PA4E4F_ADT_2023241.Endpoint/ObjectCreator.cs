@@ -23,6 +23,12 @@ namespace PA4E4F_ADT_2023241.Endpoint
                 if (_newObject is Teacher && _newObject != null) Factory.CreateTeacherLogic().Create(_newObject as Teacher);
                 if (_newObject is Subject && _newObject != null) Factory.CreateSubjectLogic().Create(_newObject as Subject);
 
+                if(_newObject == null)
+                {
+                    Context.Response.StatusCode = 200;
+                    return "Object cannot be converted.";
+                }
+
                 Context.Response.StatusCode = 200;
 
                 return $"{_newObject.GetType().Name} successfully created with id {ObjectId}";

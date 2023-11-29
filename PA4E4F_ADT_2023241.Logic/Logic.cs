@@ -58,7 +58,7 @@ namespace PA4E4F_ADT_2023241.Logic
             }
         }
 
-        public void Delete(Func<T, bool> QueryExpression)
+        public virtual void Delete(Func<T, bool> QueryExpression)
         {
             try
             {

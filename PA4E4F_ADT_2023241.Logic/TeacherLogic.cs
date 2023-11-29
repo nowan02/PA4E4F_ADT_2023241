@@ -48,6 +48,7 @@ namespace PA4E4F_ADT_2023241.Logic
 
             if (Grade < 0 || Grade > 5) throw new ArgumentException("Grade was not in range of 0 - 5!");
             if (su.TeacherId != TeacherId) throw new ArgumentException("This teacher cannot grade, as they are not the subject teacher!");
+            if (!su.EnrolledStudents.Contains(s)) throw new ArgumentException("Student is not enrolled in this subject!");
 
             Grade _g1;
 

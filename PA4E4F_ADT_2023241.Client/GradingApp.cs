@@ -66,6 +66,8 @@ namespace PA4E4F_ADT_2023241.Client
                         break;
                     case "listall": CheckAll();
                         break;
+                    case "check": CheckObject(); 
+                        break;
                     default:
                         Console.WriteLine("Unknown command.");
                         break;
@@ -247,21 +249,39 @@ namespace PA4E4F_ADT_2023241.Client
                         {
                             Console.WriteLine("\t{0} {1}", su.Id, su.Name);
                         }
+                        foreach(Grade g in _deserializeSeveral("/Student/{id}/Grades"))
+                        {
+                            Console.WriteLine("\tSubjectId {0}: {1}", g.SubjectId, g.FinalGrade);
+                        }
                         break;
                     case "teacher":
-                        
+                        Teacher t = (Teacher)_deserialize($"/Teachers/{id}");
+                        Console.WriteLine("Teacher: {0} {1}", t.Id, t.Name);
+                        Console.WriteLine("Taughts subjects:");
+                        foreach (Subject sub in _deserializeSeveral($"/Teachers/{id}/Subjects"))
+                        {
+                            Console.WriteLine("\t{0} {1}", sub.Id, sub.Name);
+                        }
                         break;
                     case "subject":
-
+                        Subject subj = (Subject)_deserialize($"/Subjects/{id}");
+                        Teacher sut = (Teacher)_deserialize($"/Subjects/{id}/Teacher");
+                        Console.WriteLine("Subject: {0} {1}", subj.Id, subj.Name);
+                        Console.WriteLine("Teacher:\n\t{0}", sut.Id, sut.Name);
+                        Console.WriteLine("Students enrolled:");
+                        foreach (Student sd in _deserializeSeveral($"/Subjects/{id}/Students"))
+                        {
+                            Console.WriteLine("\t{0} {1}", sd.Id, sd.Name);
+                        }
                         break;
                     default:
-
-                     break;
+                        Console.WriteLine("Invalid input");
+                        break;
                 }
             }
             catch(InvalidCastException)
             {
-                Console.WriteLine("Invalid id give, aborting command.");
+                Console.WriteLine("Invalid id given, aborting command.");
                 return;
             }
         }

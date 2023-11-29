@@ -55,6 +55,10 @@ namespace PA4E4F_ADT_2023241.Logic
         {
             Student? s = _ownRepository.Read(StudentId);
             Subject? su = _subjectRepository.Read(Subjectid);
+
+            if (!su.EnrolledStudents.Contains(s)) throw new ArgumentException("Student is not enrolled in this class");
+            if (su == null) throw new NullReferenceException("This subject doesn't exist.");
+
             su.EnrolledStudents.Remove(s);
             _subjectRepository.Update(su.Id, su);
             s.Subjects.Remove(su);
