@@ -25,7 +25,7 @@ namespace PA4E4F_ADT_2023241.Endpoint
 
                 if(_newObject == null)
                 {
-                    Context.Response.StatusCode = 200;
+                    Context.Response.StatusCode = 500;
                     return "Object cannot be converted.";
                 }
 

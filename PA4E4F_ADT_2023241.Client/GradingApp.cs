@@ -60,6 +60,7 @@ namespace PA4E4F_ADT_2023241.Client
                         Console.WriteLine("create: Create new object");
                         Console.WriteLine("listall: List all entries of specified type.");
                         Console.WriteLine("check: List an entry of a specified type and id");
+                        Console.WriteLine("delete: Delete an object");
                         Console.WriteLine("exit: exits app");
                         break;
                     case "create": CreateObject();
@@ -94,8 +95,6 @@ namespace PA4E4F_ADT_2023241.Client
                 case "Teacher": URI += $"/Teachers/{Model.Id}/Create";
                     break;
                 case "Subject": URI += $"/Subjects/{Model.Id}/Create";
-                    break;
-                case "Grade": URI += $"/Grades/{Model.Id}/Create";
                     break;
                 default:
                     Console.WriteLine("Object type cannot be serialized.");
@@ -280,6 +279,42 @@ namespace PA4E4F_ADT_2023241.Client
                 }
             }
             catch(InvalidCastException)
+            {
+                Console.WriteLine("Invalid id given, aborting command.");
+                return;
+            }
+        }
+    
+        public void DeleteObject()
+        {
+            Console.WriteLine("\nChoose object to delete: [Student, Teacher, Subject]");
+            string? input = Console.ReadLine().ToLower();
+            Console.WriteLine("The id of the object:");
+            HttpResponseMessage response;
+            try
+            {
+                int id = Int32.Parse(Console.ReadLine());
+                Console.Clear();
+                switch (input)
+                {
+                    case "student":
+                        response = _httpClient.Send(new HttpRequestMessage(HttpMethod.Delete, Uri + $"/Students/{id}/Delete"));
+                        Console.WriteLine("Response from server: {0}", response.Content.ReadAsStringAsync().Result);
+                        break;
+                    case "teacher":
+                        response = _httpClient.Send(new HttpRequestMessage(HttpMethod.Delete, Uri + $"/Teachers/{id}/Delete"));
+                        Console.WriteLine("Response from server: {0}", response.Content.ReadAsStringAsync().Result);
+                        break;
+                    case "subject":
+                        response = _httpClient.Send(new HttpRequestMessage(HttpMethod.Delete, Uri + $"/Subjects/{id}/Delete"));
+                        Console.WriteLine("Response from server: {0}", response.Content.ReadAsStringAsync().Result);
+                        break;
+                    default:
+                        Console.WriteLine("Invalid input");
+                        break;
+                }
+            }
+            catch (InvalidCastException)
             {
                 Console.WriteLine("Invalid id given, aborting command.");
                 return;

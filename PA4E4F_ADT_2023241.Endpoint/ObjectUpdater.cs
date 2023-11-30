@@ -21,15 +21,12 @@ namespace PA4E4F_ADT_2023241.Endpoint
 
                 if (_newObject is Student) Factory.CreateStudentLogic().Update(_newObject as Student, x => x.Id == ObjectId);
                 if (_newObject is Teacher) Factory.CreateTeacherLogic().Update(_newObject as Teacher, x => x.Id == ObjectId);
-                if (_newObject is Subject)
-                {
-                    Factory.CreateSubjectLogic().Update(_newObject as Subject, x => x.Id == ObjectId);
-                }
-                else
+                if (_newObject is Subject) Factory.CreateSubjectLogic().Update(_newObject as Subject, x => x.Id == ObjectId);
+
+                if (_newObject == null)
                 {
                     Context.Response.StatusCode = 500;
-
-                    return "Object sent cannot be converted.";
+                    return "Object cannot be converted.";
                 }
 
                 return $"{_newObject.GetType().Name} successfully created with id {ObjectId}";
