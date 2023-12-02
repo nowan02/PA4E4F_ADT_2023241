@@ -36,7 +36,7 @@ namespace PA4E4F_ADT_2023241.Logic
         {
             return _subjectRepository.ReadAll().Where(su => su.TeacherId == TeacherId);
         }
-        public void GradeStudentInSubject(int TeacherId, int StudentId, int SubjectId, int Grade)
+        public void GradeStudentInSubject(int TeacherId, int StudentId, int SubjectId, int Grade, string Desc)
         {
             Teacher? t = _ownRepository.Read(TeacherId);
             Student? s = _studentRepository.Read(StudentId);
@@ -52,11 +52,22 @@ namespace PA4E4F_ADT_2023241.Logic
 
             Grade _g1;
 
-            Grade? _g2 = _gradeRepository.ReadAll().First(g => g.SubjectId == SubjectId);
+            Grade? _g2 = _gradeRepository.ReadAll().First(g => g.SubjectId == SubjectId && g.TeacherId == TeacherId && g.StudentId == StudentId);
 
             if (_g2 != null)
             {
-                _g1 = _g2;
+                _g1 = new Grade
+                {
+                    StudentId = _g2.StudentId,
+                    SubjectId = _g2.SubjectId,
+                    TeacherId = _g2.TeacherId,
+                    FinalGrade = Grade,
+                    Name = Desc,
+                };
+
+                if (Desc.Length == 0) _g1.Name = _g2.Name;
+
+                _gradeRepository.Update(_g2.Id, _g1);
             }
             else
             {
@@ -64,13 +75,12 @@ namespace PA4E4F_ADT_2023241.Logic
                     FinalGrade = Grade,
                     StudentId = StudentId,
                     TeacherId = TeacherId,
-                    SubjectId = SubjectId
+                    SubjectId = SubjectId,
+                    Name = Desc
                 };
 
                 _gradeRepository.Create(_g1);
             }
-
-            s.Grades.Add(_g1);
 
             _studentRepository.Update(StudentId, s);
         }

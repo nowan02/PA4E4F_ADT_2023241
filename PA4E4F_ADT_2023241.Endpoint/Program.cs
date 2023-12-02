@@ -23,19 +23,26 @@ app.MapGet("/", async context => await context.Response.WriteAsync("Working as i
 app.MapGet("/Students", async context => await context.Response.WriteAsync(JsonConvert.SerializeObject(factory.CreateStudentLogic().ReadAll(), Formatting.Indented)));
 app.MapGet("/Students/{id}", async (HttpContext context, int id) => await context.Response.WriteAsync(JsonConvert.SerializeObject(factory.CreateStudentLogic().Read(s => s.Id == id), Formatting.Indented)));
 app.MapGet("/Students/{id}/Grades", async (HttpContext context, int id) => await context.Response.WriteAsync(JsonConvert.SerializeObject(factory.CreateStudentLogic().GetGradesOfStudent(id), Formatting.Indented)));
-app.MapGet("/Students/{id}/Subjects", async (HttpContext context, int id) => await context.Response.WriteAsync(JsonConvert.SerializeObject(factory.CreateStudentLogic().GetSubjectsOfStudent(id), Formatting.Indented)));
+app.MapGet("/Students/{id}/Subjects", async (HttpContext context, int id) => { try {
+        await context.Response.WriteAsync(JsonConvert.SerializeObject(factory.CreateStudentLogic().GetSubjectsOfStudent(id), Formatting.Indented));
+    }
+    catch (Exception ex)
+    {
+        await context.Response.WriteAsync(ex.Message);
+    }
+});
 app.MapGet("/Students/{id}/Average", async (HttpContext context, int id) => await   context.Response.WriteAsync(JsonConvert.SerializeObject(factory.CreateStudentLogic().GetStudentAverage(id), Formatting.Indented)));
-app.MapGet("/Students/{id}/Enroll/{SubId}", async (HttpContext context, int id, int SubId) => await context.Response.WriteAsync(Enrollment.Enroll(context, id, SubId, factory)));
 
 // Student POST
 app.MapPost("/Students/{id}/Create", async (HttpContext context, int id) => await context.Response.WriteAsync(ObjectCreator.CreateObject<Student>(context, id, factory)));
 
 // Student PUT
 app.MapPut("/Students/{id}/Update", async (HttpContext context, int id) => await context.Response.WriteAsync(ObjectUpdater.UpdateObject<Student>(context, id, factory)));
+app.MapPut("/Students/{id}/Enroll/{SubId}", async (HttpContext context, int id, int SubId) => await context.Response.WriteAsync(Enrollment.Enroll(context, id, SubId, factory)));
+app.MapPut("/Students/{id}/Drop/{SubId}", async (HttpContext context, int id, int SubId) => await context.Response.WriteAsync(Enrollment.Drop(context, id, SubId, factory)));
 
 // Student DELETE
 app.MapDelete("/Students/{id}/Delete", async (HttpContext context, int id) => await context.Response.WriteAsync(ObjectDelete.Delete<Student>(context, id, factory)));
-app.MapDelete("/Students/{id}/Drop/{SubId}", async (HttpContext context, int id, int SubId) => await context.Response.WriteAsync(Enrollment.Drop(context, id, SubId, factory)));
 
 // Teacher GET
 app.MapGet("/Teachers", async context => await context.Response.WriteAsync(JsonConvert.SerializeObject(factory.CreateTeacherLogic().ReadAll(), Formatting.Indented)));

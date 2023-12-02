@@ -91,6 +91,9 @@ namespace PA4E4F_ADT_2023241.Repository
             Grade grade = Read(id);
 
             grade.FinalGrade = entity.FinalGrade;
+            grade.StudentId = entity.StudentId;
+            grade.TeacherId = entity.TeacherId;
+            grade.SubjectId = entity.SubjectId;
 
             base.Update(id, entity);
         }

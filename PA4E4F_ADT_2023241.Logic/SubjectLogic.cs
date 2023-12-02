@@ -37,12 +37,19 @@ namespace PA4E4F_ADT_2023241.Logic
         
         public Teacher? GetSubjectTeacher(int SubjectId)
         {
-            return _teacherRepository.Read(_ownRepository.Read(SubjectId).TeacherId);
+            try
+            {
+                return _teacherRepository.Read(_ownRepository.Read(SubjectId).TeacherId);
+            }
+            catch(NullReferenceException ex)
+            {
+                throw ex;
+            }
         }
 
         public IEnumerable<Subject> GetSubjectsWithNoTeacher()
         {
-            return _ownRepository.ReadAll().Where(su => su.SubjectTeacher == null);
+            return _ownRepository.ReadAll().Where(su => su.TeacherId == 0);
         }
     }
 }

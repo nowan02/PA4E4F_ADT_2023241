@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http.Json;
-using System.Net.Sockets;
-using System.Net.WebSockets;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.VisualBasic;
+﻿using System.Net;
 using Newtonsoft.Json;
 using PA4E4F_ADT_2023241.Models;
 
@@ -27,7 +15,7 @@ namespace PA4E4F_ADT_2023241.Client
             _httpClient = httpClient;
         }
 
-        public void EnsureConnection()
+        public bool EnsureConnection()
         {
             _httpClient.BaseAddress = new Uri(Uri);
             Console.WriteLine("Client configured for server: {0}", Uri);
@@ -36,10 +24,12 @@ namespace PA4E4F_ADT_2023241.Client
             {
                 HttpResponseMessage response = _httpClient.Send(new HttpRequestMessage(HttpMethod.Get, Uri + "/"));
                 Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+                return true;
             }
             catch(HttpRequestException)
             {
                 Console.WriteLine("Connection refused, please check your URI!");
+                return false;
             }
         }
 
@@ -48,7 +38,7 @@ namespace PA4E4F_ADT_2023241.Client
             bool run = true;
             while(run)
             {
-                Console.WriteLine("Write 'help' to list commands");
+                Console.WriteLine("\nWrite 'help' to list commands");
                 string input = Console.ReadLine().ToLower();
                 switch(input)
                 {
@@ -59,8 +49,13 @@ namespace PA4E4F_ADT_2023241.Client
                         Console.WriteLine("help: List commands");
                         Console.WriteLine("create: Create new object");
                         Console.WriteLine("listall: List all entries of specified type.");
+                        Console.WriteLine("unattended: List all classes that have no teachers.");
                         Console.WriteLine("check: List an entry of a specified type and id");
                         Console.WriteLine("delete: Delete an object");
+                        Console.WriteLine("enroll: Enroll a student in a subject");
+                        Console.WriteLine("drop: Drop a student from a subject");
+                        Console.WriteLine("grade: Give a student a grade in a subject");
+                        Console.WriteLine("clear: Clear console");
                         Console.WriteLine("exit: exits app");
                         break;
                     case "create": CreateObject();
@@ -68,6 +63,16 @@ namespace PA4E4F_ADT_2023241.Client
                     case "listall": CheckAll();
                         break;
                     case "check": CheckObject(); 
+                        break;
+                    case "clear": Console.Clear();
+                        break;
+                    case "enroll": Enroll();
+                        break;
+                    case "drop": Drop();
+                        break;
+                    case "grade": Grade();
+                        break;
+                    case "unattended": Unattended();
                         break;
                     default:
                         Console.WriteLine("Unknown command.");
@@ -143,7 +148,7 @@ namespace PA4E4F_ADT_2023241.Client
 
             if (path.EndsWith("Students")) Models.AddRange(JsonConvert.DeserializeObject<List<Student>>(content));
             if (path.EndsWith("Teachers")) Models.AddRange(JsonConvert.DeserializeObject<List<Teacher>>(content));
-            if (path.EndsWith("Subjects")) Models.AddRange(JsonConvert.DeserializeObject<List<Subject>>(content));
+            if (path.EndsWith("Subjects") || path.EndsWith("Subjects/Unattended")) Models.AddRange(JsonConvert.DeserializeObject<List<Subject>>(content));
             if (path.EndsWith("Grades")) Models.AddRange(JsonConvert.DeserializeObject<List<Grade>>(content));
 
             return Models;
@@ -213,13 +218,13 @@ namespace PA4E4F_ADT_2023241.Client
                     }
                     break;
                 case "teacher":
-                    foreach (Teacher t in _deserializeSeveral("/Students"))
+                    foreach (Teacher t in _deserializeSeveral("/Teachers"))
                     {
                         Console.WriteLine("\t{0} {1}", t.Id, t.Name);
                     }
                     break;
                 case "subject":
-                    foreach (Subject su in _deserializeSeveral("/Students"))
+                    foreach (Subject su in _deserializeSeveral("/Subjects"))
                     {
                         Console.WriteLine("\t{0} {1}", su.Id, su.Name);
                     }
@@ -318,6 +323,94 @@ namespace PA4E4F_ADT_2023241.Client
             {
                 Console.WriteLine("Invalid id given, aborting command.");
                 return;
+            }
+        }
+
+        public void Enroll()
+        {
+            try
+            {
+                Console.WriteLine("\nChoose student id:");
+                int StudentId = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("Choose a subject id:");
+                int SubjectId = int.Parse(Console.ReadLine());
+
+                HttpResponseMessage response = _httpClient.Send(new HttpRequestMessage(HttpMethod.Put, Uri + $"/Students/{StudentId}/Enroll/{SubjectId}"));
+                Console.WriteLine("Response from server: {0}", response.Content.ReadAsStringAsync().Result);
+            }
+            catch (InvalidCastException)
+            {
+                Console.WriteLine("Invalid id given, aborting command.");
+                return;
+            }
+        }
+
+        public void Drop()
+        {
+            try
+            {
+                Console.WriteLine("\nChoose student id:");
+                int StudentId = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("Choose a subject id:");
+                int SubjectId = int.Parse(Console.ReadLine());
+
+                HttpResponseMessage response = _httpClient.Send(new HttpRequestMessage(HttpMethod.Put, Uri + $"/Students/{StudentId}/Drop/{SubjectId}"));
+                Console.WriteLine("Response from server: {0}", response.Content.ReadAsStringAsync().Result);
+            }
+            catch (InvalidCastException)
+            {
+                Console.WriteLine("Invalid id given, aborting command.");
+                return;
+            }
+        }
+
+        public void Grade()
+        {
+            try
+            {
+                Console.WriteLine("\nChoose student id:");
+                int StudentId = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("Choose a teacher id:");
+                int TeacherId = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("Choose a subject id:");
+                int SubjectId = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("Grade value < 0 - 5 >");
+                int FinalGrade = int.Parse(Console.ReadLine());
+
+                Grade newgrade = new Grade
+                {
+                    StudentId = StudentId,
+                    SubjectId = SubjectId,
+                    TeacherId = TeacherId,
+                    FinalGrade = FinalGrade
+                };
+
+                Console.WriteLine("What is the grade for? (Not mandatory):");
+                newgrade.Name = Console.ReadLine();
+
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Uri + $"/Teachers/{TeacherId}/Grade/{StudentId}");
+                request.Content = new StringContent(JsonConvert.SerializeObject(newgrade, Formatting.Indented));
+                HttpResponseMessage response = _httpClient.Send(request);
+                Console.WriteLine("Response from server: {0}", response.Content.ReadAsStringAsync().Result);
+            }
+            catch (InvalidCastException)
+            {
+                Console.WriteLine("Invalid id given, aborting command.");
+                return;
+            }
+        }
+
+        public void Unattended()
+        {
+            Console.WriteLine("\n Subjects with no teachers:");
+            foreach (Subject su in _deserializeSeveral("/Subjects/Unattended"))
+            {
+                Console.WriteLine("\t{0}, {1}", su.Id, su.Name);
             }
         }
     }

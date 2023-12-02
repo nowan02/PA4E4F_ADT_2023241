@@ -8,7 +8,7 @@
             {
                 Factory.CreateStudentLogic().EnrollStudentInSubject(StudentId, SubjectId);
                 Context.Response.StatusCode = 200;
-                return "Student was successfully enrolled";
+                return $"Student {StudentId} was successfully enrolled in subject {SubjectId}";
             }
             catch (Exception ex)
             {
@@ -23,7 +23,7 @@
             {
                 Factory.CreateStudentLogic().DropStudentsSubject(StudentId, SubjectId);
                 Context.Response.StatusCode = 200;
-                return "Student was successfully removed from subject";
+                return $"Student {StudentId} was successfully removed from subject {SubjectId}";
             }
             catch (Exception ex)
             {

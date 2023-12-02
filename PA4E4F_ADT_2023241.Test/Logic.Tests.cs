@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 using NUnit.Framework;
 using Moq;
 using PA4E4F_ADT_2023241.Logic;
 using PA4E4F_ADT_2023241.Models;
 using PA4E4F_ADT_2023241.Repository;
-using System.Security.Cryptography.X509Certificates;
+
 
 namespace PA4E4F_ADT_2023241.Tests
 {
@@ -12,6 +12,7 @@ namespace PA4E4F_ADT_2023241.Tests
     {
         List<Subject> subjects;
         List<Student> students;
+        List<Teacher> teachers;
 
         IStudentLogic MockedStudentLogic;
         ITeacherLogic MockedTeacherLogic;
@@ -39,13 +40,14 @@ namespace PA4E4F_ADT_2023241.Tests
 
             subjects = new List<Subject>();
             students = new List<Student>();
+            teachers = new List<Teacher>();
             for(int i = 0; i < 5; i++)
             {
                 subjects.Add(new Subject { Id = i, Name = "subject" + i, EnrolledStudents = new List<Student>()});
                 students.Add(new Student { Id = i, Name = "student" + i, Subjects = new List<Subject>()});
             }
 
-            subjects[1].SubjectTeacher = new Teacher { Name = "teacher3", Id = 3 };
+            teachers.Add(new Teacher { Name = "teacher3", Id = 3 });
             subjects[1].TeacherId = 3;
 
             subjects[1].EnrolledStudents = new List<Student> { students[1], students[2], students[3], students[4] };
@@ -55,7 +57,7 @@ namespace PA4E4F_ADT_2023241.Tests
             students[3].Subjects.Add(subjects[1]);
             students[4].Subjects.Add(subjects[1]);
 
-            subjects[2].SubjectTeacher = new Teacher { Name = "teacher5", Id = 5 };
+            teachers.Add(new Teacher { Name = "teacher5", Id = 5 });
             subjects[2].TeacherId = 5;
         }
 
@@ -117,7 +119,7 @@ namespace PA4E4F_ADT_2023241.Tests
 
             foreach(Subject subject in returned)
             {
-                if (subject.SubjectTeacher == null)
+                if (subject.TeacherId == 0)
                 {
                     continue;
                 }
@@ -132,26 +134,26 @@ namespace PA4E4F_ADT_2023241.Tests
         [Test]
         public void GradeStudentInSubjectThrowsArgumentExceptionWhenOutOfBounds([Values(-1, 6, 24, -9)] int grade)
         {
-            MockedTeacherRepository.Setup(repo => repo.Read(subjects[1].TeacherId)).Returns(subjects[1].SubjectTeacher);
+            MockedTeacherRepository.Setup(repo => repo.Read(subjects[1].TeacherId)).Returns(teachers[0]);
             MockedStudentRepository.Setup(repo => repo.Read(students[1].Id)).Returns(students[1]);
             MockedSubjectRepository.Setup(repo => repo.Read(subjects[1].Id)).Returns(subjects[1]);
 
             Assert.Throws<ArgumentException>(() =>
             {
-                MockedTeacherLogic.GradeStudentInSubject(subjects[1].SubjectTeacher.Id, students[1].Id, subjects[1].Id, grade);
+                MockedTeacherLogic.GradeStudentInSubject(subjects[1].TeacherId, students[1].Id, subjects[1].Id, grade, It.IsAny<String>());
             });
         }
 
         [Test]
         public void GradeStudentInSubjectOtherTeacherCantGrade()
         {
-            MockedTeacherRepository.Setup(repo => repo.Read(subjects[2].TeacherId)).Returns(subjects[2].SubjectTeacher);
+            MockedTeacherRepository.Setup(repo => repo.Read(subjects[2].TeacherId)).Returns(teachers[1]);
             MockedStudentRepository.Setup(repo => repo.Read(students[1].Id)).Returns(students[1]);
             MockedSubjectRepository.Setup(repo => repo.Read(subjects[1].Id)).Returns(subjects[1]);
 
             Assert.Throws<ArgumentException>(() =>
             {
-                MockedTeacherLogic.GradeStudentInSubject(subjects[2].TeacherId, students[1].Id, subjects[1].Id, 3);
+                MockedTeacherLogic.GradeStudentInSubject(subjects[2].TeacherId, students[1].Id, subjects[1].Id, 3, It.IsAny<String>());
             });
         }
 
@@ -193,6 +195,25 @@ namespace PA4E4F_ADT_2023241.Tests
 
         // 2x else
 
+        [Test]
+        public void OnlyGradesStudentOnSubject()
+        {
+            MockedTeacherRepository.Setup(repo => repo.Read(subjects[2].TeacherId)).Returns(teachers[1]);
+            MockedStudentRepository.Setup(repo => repo.Read(students[4].Id)).Returns(students[4]);
+            MockedSubjectRepository.Setup(repo => repo.Read(subjects[2].Id)).Returns(subjects[2]);
 
+            Assert.Throws<ArgumentException>(() =>
+            {
+                MockedTeacherLogic.GradeStudentInSubject(subjects[2].TeacherId, students[4].Id, subjects[2].Id, 3, It.IsAny<String>());
+            });
+        }
+
+        [Test]
+        public void DropStudentsSubjectThrowsNullRefExceptionWhenSubjectIsNull()
+        {
+            MockedStudentRepository.Setup(repo => repo.Read(students[3].Id)).Returns(students[3]);
+
+            Assert.Throws<NullReferenceException>(() => MockedStudentLogic.EnrollStudentInSubject(students[3].Id, 9999));
+        }
     }
 }

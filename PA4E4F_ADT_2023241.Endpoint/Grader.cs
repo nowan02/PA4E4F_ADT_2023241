@@ -25,7 +25,7 @@ namespace PA4E4F_ADT_2023241.Endpoint
                     return "Object cannot be converted";
                 }
 
-                Factory.CreateTeacherLogic().GradeStudentInSubject(TeacherId, StudentId, SubjectId, _newGrade.FinalGrade);
+                Factory.CreateTeacherLogic().GradeStudentInSubject(TeacherId, StudentId, SubjectId, _newGrade.FinalGrade, _newGrade.Name);
 
                 return $"Student with id {StudentId} has received grade for subject {SubjectId}: {_newGrade.FinalGrade}";
             }

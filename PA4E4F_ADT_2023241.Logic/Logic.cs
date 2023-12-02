@@ -32,7 +32,7 @@ namespace PA4E4F_ADT_2023241.Logic
                 T? Readable = _ownRepository.ReadAll().FirstOrDefault(QueryExpression);
                 return _ownRepository.Read(Readable.Id);
             }
-            catch(InvalidOperationException ex) 
+            catch(NullReferenceException ex) 
             {
                 throw ex;
             }
@@ -84,7 +84,7 @@ namespace PA4E4F_ADT_2023241.Logic
     {
         public IEnumerable<Grade> GetGradesOfTeacher(int TeacherId);
         public IEnumerable<Subject> GetTaughtSubjects(int TeacherId);
-        public void GradeStudentInSubject(int TeacherId, int StudentId, int SubjectId, int Grade);
+        public void GradeStudentInSubject(int TeacherId, int StudentId, int SubjectId, int Grade, string Desc);
     }
 
     public interface ISubjectLogic : ILogic<Subject>
