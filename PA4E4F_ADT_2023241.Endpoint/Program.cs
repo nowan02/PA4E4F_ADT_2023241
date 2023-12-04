@@ -32,7 +32,7 @@ app.MapGet("/Students", async context => { try
 });
 app.MapGet("/Students/{id}", async (HttpContext context, int id) => { try
     {
-        await context.Response.WriteAsync(JsonConvert.SerializeObject(factory.CreateStudentLogic().Read(s => s.Id == id), Formatting.Indented))
+        await context.Response.WriteAsync(JsonConvert.SerializeObject(factory.CreateStudentLogic().Read(s => s.Id == id), Formatting.Indented));
     }
     catch(Exception ex)
     {
