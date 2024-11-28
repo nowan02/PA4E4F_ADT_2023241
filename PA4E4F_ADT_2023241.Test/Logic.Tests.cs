@@ -61,7 +61,7 @@ namespace PA4E4F_ADT_2023241.Tests
             subjects[2].TeacherId = 5;
         }
 
-        // Create test 3x
+        // C1
         [Test]
         public void NamelessStudentThrowsArgumentException()
         {
@@ -76,6 +76,7 @@ namespace PA4E4F_ADT_2023241.Tests
             MockedStudentRepository.Verify();
         }
 
+        // C2
         [Test]
         public void StudentWithDuplicateIdThrowsArgumentException()
         {
@@ -94,69 +95,22 @@ namespace PA4E4F_ADT_2023241.Tests
             MockedGradeRepository.Verify();
         }
 
+        // C3
         [Test]
-        public void NamelessTeacherThrowsArgumentException()
+        public void QueryUnknownTeacher()
         {
             Teacher t = new Teacher
             {
-                Name = "",
+                Name = "I don't exist",
                 Id = 999
             };
 
-            Assert.Throws<ArgumentException>(() => MockedTeacherLogic.Create(t));
+            Assert.Throws<NullReferenceException>(() => MockedTeacherLogic.Read(x => x.Name.Equals("I don't exist")));
 
             MockedStudentRepository.Verify();
         }
 
-        // 5x Non-crud
-
-        [Test]
-        public void SubjectsWithNoTeacherReturnOnlyNull()
-        {
-            MockedSubjectRepository.Setup(repo => repo.ReadAll()).Returns(subjects.AsQueryable());
-
-            IEnumerable<Subject> returned = MockedSubjectLogic.GetSubjectsWithNoTeacher();
-
-            foreach(Subject subject in returned)
-            {
-                if (subject.TeacherId == 0)
-                {
-                    continue;
-                }
-                else Assert.Fail();
-            }
-
-            Assert.Pass();
-            MockedSubjectRepository.Verify();
-        }
-
-
-        [Test]
-        public void GradeStudentInSubjectThrowsArgumentExceptionWhenOutOfBounds([Values(-1, 6, 24, -9)] int grade)
-        {
-            MockedTeacherRepository.Setup(repo => repo.Read(subjects[1].TeacherId)).Returns(teachers[0]);
-            MockedStudentRepository.Setup(repo => repo.Read(students[1].Id)).Returns(students[1]);
-            MockedSubjectRepository.Setup(repo => repo.Read(subjects[1].Id)).Returns(subjects[1]);
-
-            Assert.Throws<ArgumentException>(() =>
-            {
-                MockedTeacherLogic.GradeStudentInSubject(subjects[1].TeacherId, students[1].Id, subjects[1].Id, grade, It.IsAny<String>());
-            });
-        }
-
-        [Test]
-        public void GradeStudentInSubjectOtherTeacherCantGrade()
-        {
-            MockedTeacherRepository.Setup(repo => repo.Read(subjects[2].TeacherId)).Returns(teachers[1]);
-            MockedStudentRepository.Setup(repo => repo.Read(students[1].Id)).Returns(students[1]);
-            MockedSubjectRepository.Setup(repo => repo.Read(subjects[1].Id)).Returns(subjects[1]);
-
-            Assert.Throws<ArgumentException>(() =>
-            {
-                MockedTeacherLogic.GradeStudentInSubject(subjects[2].TeacherId, students[1].Id, subjects[1].Id, 3, It.IsAny<String>());
-            });
-        }
-
+        // C4
         [Test]
         public void EnrollStudentInSubjectUpdates()
         {
@@ -175,12 +129,117 @@ namespace PA4E4F_ADT_2023241.Tests
             Assert.Fail();
         }
 
+        // L1
+        [Test]
+        public void SubjectsWithNoTeacherReturnOnlyNull()
+        {
+            MockedSubjectRepository.Setup(repo => repo.ReadAll()).Returns(subjects.AsQueryable());
+
+            IEnumerable<Subject> returned = MockedSubjectLogic.GetSubjectsWithNoTeacher();
+
+            foreach(Subject subject in returned)
+            {
+                if (subject.TeacherId == 0)
+                {
+                    continue;
+                }
+                else Assert.Fail();
+            }
+
+            MockedSubjectRepository.Verify();
+            Assert.Pass();
+        }
+
+        // L2
+        [Test]
+        public void GradeStudentInSubjectThrowsArgumentExceptionWhenOutOfBounds([Values(-1, 6, 24, -9)] int grade)
+        {
+            MockedTeacherRepository.Setup(repo => repo.Read(subjects[1].TeacherId)).Returns(teachers[0]);
+            MockedStudentRepository.Setup(repo => repo.Read(students[1].Id)).Returns(students[1]);
+            MockedSubjectRepository.Setup(repo => repo.Read(subjects[1].Id)).Returns(subjects[1]);
+
+            MockedTeacherRepository.Verify();
+            MockedStudentRepository.Verify();
+            MockedSubjectRepository.Verify();
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                MockedTeacherLogic.GradeStudentInSubject(subjects[1].TeacherId, students[1].Id, subjects[1].Id, grade, It.IsAny<String>());
+            });
+        }
+
+        // L3
+        [Test]
+        public void GradeStudentInSubjectOtherTeacherCantGrade()
+        {
+            MockedTeacherRepository.Setup(repo => repo.Read(subjects[2].TeacherId)).Returns(teachers[1]);
+            MockedStudentRepository.Setup(repo => repo.Read(students[1].Id)).Returns(students[1]);
+            MockedSubjectRepository.Setup(repo => repo.Read(subjects[1].Id)).Returns(subjects[1]);
+
+            MockedTeacherRepository.Verify();
+            MockedStudentRepository.Verify();
+            MockedSubjectRepository.Verify();
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                MockedTeacherLogic.GradeStudentInSubject(subjects[2].TeacherId, students[1].Id, subjects[1].Id, 3, It.IsAny<String>());
+            });
+        }
+
+        // L4
+        [Test]
+        public void OnlyGradesStudentOnSubject()
+        {
+            MockedTeacherRepository.Setup(repo => repo.Read(subjects[2].TeacherId)).Returns(teachers[1]);
+            MockedStudentRepository.Setup(repo => repo.Read(students[4].Id)).Returns(students[4]);
+            MockedSubjectRepository.Setup(repo => repo.Read(subjects[2].Id)).Returns(subjects[2]);
+
+            MockedTeacherRepository.Verify();
+            MockedStudentRepository.Verify();
+            MockedSubjectRepository.Verify();
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                MockedTeacherLogic.GradeStudentInSubject(subjects[2].TeacherId, students[4].Id, subjects[2].Id, 3, It.IsAny<String>());
+            });
+        }
+
+        // L5
+        [Test]
+        public void EnrollmentUpdatesStudentList()
+        {
+            MockedSubjectRepository.Setup(repo => repo.Read(subjects[3].Id)).Returns(subjects[3]);
+            MockedStudentRepository.Setup(repo => repo.Read(students[3].Id)).Returns(students[3]);
+
+            MockedStudentLogic.EnrollStudentInSubject(subjects[3].Id, students[3].Id);
+
+            MockedStudentRepository.Verify();
+            MockedSubjectRepository.Verify();
+
+            if (students[3].Subjects.Contains(subjects[3]) && subjects[3].EnrolledStudents.Contains(students[3])) Assert.Pass();
+
+            Assert.Fail();
+        }
+
+        // L6
+        [Test]
+        public void EnrollStudentsSubjectThrowsNullRefExceptionWhenSubjectIsNull()
+        {
+            MockedStudentRepository.Setup(repo => repo.Read(students[3].Id)).Returns(students[3]);
+
+            MockedStudentRepository.Verify();
+
+            Assert.Throws<NullReferenceException>(() => MockedStudentLogic.EnrollStudentInSubject(students[3].Id, 9999));
+        }
+
+
+        // L7
         [Test]
         public void GetStudentsInSubjectReturnsOnlyEnrolled()
         {
             MockedStudentRepository.Setup(repo => repo.ReadAll()).Returns(students.AsQueryable());
 
-            foreach(Student s in MockedSubjectLogic.GetStudentsOnSubject(subjects[1].Id))
+            foreach (Student s in MockedSubjectLogic.GetStudentsOnSubject(subjects[1].Id))
             {
                 if (s.Subjects.Contains(subjects[1]))
                 {
@@ -189,31 +248,8 @@ namespace PA4E4F_ADT_2023241.Tests
                 else Assert.Fail();
             }
 
-            Assert.Pass();
             MockedStudentRepository.Verify();
-        }
-
-        // 2x else
-
-        [Test]
-        public void OnlyGradesStudentOnSubject()
-        {
-            MockedTeacherRepository.Setup(repo => repo.Read(subjects[2].TeacherId)).Returns(teachers[1]);
-            MockedStudentRepository.Setup(repo => repo.Read(students[4].Id)).Returns(students[4]);
-            MockedSubjectRepository.Setup(repo => repo.Read(subjects[2].Id)).Returns(subjects[2]);
-
-            Assert.Throws<ArgumentException>(() =>
-            {
-                MockedTeacherLogic.GradeStudentInSubject(subjects[2].TeacherId, students[4].Id, subjects[2].Id, 3, It.IsAny<String>());
-            });
-        }
-
-        [Test]
-        public void DropStudentsSubjectThrowsNullRefExceptionWhenSubjectIsNull()
-        {
-            MockedStudentRepository.Setup(repo => repo.Read(students[3].Id)).Returns(students[3]);
-
-            Assert.Throws<NullReferenceException>(() => MockedStudentLogic.EnrollStudentInSubject(students[3].Id, 9999));
+            Assert.Pass();
         }
     }
 }

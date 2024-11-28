@@ -2,9 +2,6 @@ using PA4E4F_ADT_2023241.Models;
 using PA4E4F_ADT_2023241.Repository;
 using Newtonsoft.Json;
 using PA4E4F_ADT_2023241.Endpoint;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();

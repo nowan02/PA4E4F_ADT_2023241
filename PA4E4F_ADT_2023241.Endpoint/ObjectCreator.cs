@@ -6,12 +6,12 @@ namespace PA4E4F_ADT_2023241.Endpoint
 {
     public static class ObjectCreator
     {
-        public static string CreateObject<T>(HttpContext Context, int ObjectId, LogicFactory Factory) where T : IDbModel
+        public static string CreateObject<T>(HttpContext Context, int ObjectId, ILogicFactory Factory) where T : IDbModel
         {
             try
             {
                 string input;
-
+                
                 using (StreamReader sr = new(Context.Request.Body))
                 {
                     input = sr.ReadToEndAsync().Result;
@@ -19,14 +19,27 @@ namespace PA4E4F_ADT_2023241.Endpoint
 
                 T? _newObject = JsonConvert.DeserializeObject<T>(input);
 
-                if (_newObject is Student && _newObject != null) Factory.CreateStudentLogic().Create(_newObject as Student);
-                if (_newObject is Teacher && _newObject != null) Factory.CreateTeacherLogic().Create(_newObject as Teacher);
-                if (_newObject is Subject && _newObject != null) Factory.CreateSubjectLogic().Create(_newObject as Subject);
-
                 if(_newObject == null)
                 {
                     Context.Response.StatusCode = 500;
                     return "Object cannot be converted.";
+                }
+
+                if (_newObject is Student)
+                {
+                    Factory.CreateStudentLogic().Create(_newObject as Student);
+                }
+                else if (_newObject is Teacher)
+                {
+                    Factory.CreateTeacherLogic().Create(_newObject as Teacher);
+                }
+                else if (_newObject is Subject)
+                {
+                    Factory.CreateSubjectLogic().Create(_newObject as Subject);
+                }
+                else
+                {
+                    throw new InvalidCastException("Received Json can't be deserialized into an object");
                 }
 
                 Context.Response.StatusCode = 200;

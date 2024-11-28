@@ -3,7 +3,13 @@ using PA4E4F_ADT_2023241.Repository;
 
 namespace PA4E4F_ADT_2023241.Endpoint
 {
-    public class LogicFactory
+    public interface ILogicFactory
+    {
+        IStudentLogic CreateStudentLogic();
+        ITeacherLogic CreateTeacherLogic();
+        ISubjectLogic CreateSubjectLogic();
+    }
+    public class LogicFactory : ILogicFactory
     {
         protected IStudentRepository _studentRepository;
         protected ITeacherRepository _teacherRepository;
@@ -17,17 +23,17 @@ namespace PA4E4F_ADT_2023241.Endpoint
             _gradeRepository = GradeRepository;
         }
 
-        public StudentLogic CreateStudentLogic()
+        public IStudentLogic CreateStudentLogic()
         {
             return new StudentLogic(_studentRepository, _gradeRepository, _subjectRepository);
         }
 
-        public TeacherLogic CreateTeacherLogic()
+        public ITeacherLogic CreateTeacherLogic()
         {
             return new TeacherLogic(_teacherRepository, _subjectRepository, _gradeRepository, _studentRepository);
         }
 
-        public SubjectLogic CreateSubjectLogic()
+        public ISubjectLogic CreateSubjectLogic()
         {
             return new SubjectLogic(_subjectRepository, _teacherRepository, _studentRepository, _gradeRepository);
         }

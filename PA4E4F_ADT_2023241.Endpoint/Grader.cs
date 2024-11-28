@@ -5,7 +5,7 @@ namespace PA4E4F_ADT_2023241.Endpoint
 {
     public static class Grader
     {
-        public static string Grade(HttpContext Context, int TeacherId, int StudentId, int SubjectId, LogicFactory Factory)
+        public static string Grade(HttpContext Context, int TeacherId, int StudentId, int SubjectId, ILogicFactory Factory)
         {
             try
             {

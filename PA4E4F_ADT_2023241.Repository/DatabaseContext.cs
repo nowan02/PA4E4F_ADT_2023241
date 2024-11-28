@@ -219,6 +219,15 @@ namespace PA4E4F_ADT_2023241.Repository
                 mb.HasKey(g => g.Id);
                 mb.Property(g => g.Id).ValueGeneratedOnAdd();
                 mb.HasOne(g => g.Teacher).WithMany(t => t.GivenGrades).HasForeignKey(t => t.TeacherId);
+                mb.HasData(new Grade
+                {
+                    Id = 1,
+                    FinalGrade = 3,
+                    Name = "Second Exam",
+                    StudentId = 100,
+                    SubjectId = 1000,
+                    TeacherId = 1000
+                });
             });
 
             base.OnModelCreating(modelBuilder);

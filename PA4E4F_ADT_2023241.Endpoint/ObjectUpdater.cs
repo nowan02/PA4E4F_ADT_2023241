@@ -5,7 +5,7 @@ namespace PA4E4F_ADT_2023241.Endpoint
 {
     public static class ObjectUpdater
     {
-        public static string UpdateObject<T>(HttpContext Context, int ObjectId, LogicFactory Factory) where T : IDbModel
+        public static string UpdateObject<T>(HttpContext Context, int ObjectId, ILogicFactory Factory) where T : IDbModel
         {
             try
             {
